@@ -226,14 +226,16 @@ body {
 .btn-primary {
   background: linear-gradient(135deg, var(--primary), var(--primary-dark));
   border: none;
-  border-radius: 12px;
-  padding: 12px 24px;
+  border-radius: 16px;
+  padding: 16px 32px;
   color: white;
   font-weight: 600;
+  font-size: 16px;
   cursor: pointer;
   transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
+  box-shadow: 0 4px 20px rgba(99, 102, 241, 0.3);
 }
 
 .btn-primary::before {
@@ -259,15 +261,18 @@ body {
 /* Card Animations */
 .card {
   background: var(--card-bg);
-  border-radius: 20px;
-  padding: 24px;
+  border-radius: 24px;
+  padding: 32px;
   border: 1px solid var(--border);
   transition: all 0.3s ease;
+  backdrop-filter: blur(20px);
+  box-shadow: 0 8px 32px var(--shadow);
 }
 
 .card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 15px 35px var(--shadow);
+  transform: translateY(-6px);
+  box-shadow: 0 20px 40px var(--shadow);
+  border-color: rgba(255, 255, 255, 0.2);
 }
 
 /* Scroll Reveal Animation */

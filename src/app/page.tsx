@@ -118,36 +118,40 @@ export default function PersonalFinanceDashboard() {
         initial={{ y: -100, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.8, ease: "easeOut" }}
-        className="glass p-6 m-4 rounded-2xl"
+        className="glass p-8 m-6 rounded-3xl shadow-2xl"
       >
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-4">
+        <div className="flex flex-col lg:flex-row items-center justify-between gap-6">
+          <div className="flex flex-col lg:flex-row items-center gap-6 text-center lg:text-left">
             <motion.div 
-              className="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl flex items-center justify-center pulse-glow"
+              className="w-16 h-16 bg-gradient-to-r from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center pulse-glow shadow-lg"
               whileHover={{ scale: 1.1, rotate: 5 }}
               whileTap={{ scale: 0.95 }}
             >
-              <DollarSign className="w-6 h-6 text-white" />
+              <DollarSign className="w-8 h-8 text-white" />
             </motion.div>
-            <div>
-              <h1 className="text-3xl font-bold metallic-paint">Personal Finance Hub</h1>
-              <p className="text-gray-400 mt-1">Your complete financial command center</p>
+            <div className="space-y-2">
+              <h1 className="text-4xl lg:text-5xl font-bold metallic-paint leading-tight">
+                Personal Finance Hub
+              </h1>
+              <p className="text-gray-400 text-lg lg:text-xl max-w-2xl">
+                Your complete financial command center with AI-powered insights
+              </p>
             </div>
           </div>
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center gap-4">
             <motion.button 
-              className="p-3 glass rounded-xl hover-lift"
+              className="p-4 glass rounded-2xl hover-lift shadow-lg border border-white/10"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
-              <Bell className="w-5 h-5" />
+              <Bell className="w-6 h-6" />
             </motion.button>
             <motion.button 
-              className="p-3 glass rounded-xl hover-lift"
+              className="p-4 glass rounded-2xl hover-lift shadow-lg border border-white/10"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
-              <Settings className="w-5 h-5" />
+              <Settings className="w-6 h-6" />
             </motion.button>
           </div>
         </div>
@@ -158,10 +162,10 @@ export default function PersonalFinanceDashboard() {
         initial={{ y: 50, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.8, delay: 0.2 }}
-        className="px-4 mb-6"
+        className="px-6 mb-8"
       >
-        <div className="glass p-2 rounded-2xl">
-          <div className="flex space-x-2 overflow-x-auto">
+        <div className="glass p-4 rounded-3xl shadow-xl border border-white/10">
+          <div className="flex space-x-3 overflow-x-auto pb-2">
             {tabs.map((tab, index) => {
               const Icon = tab.icon;
               return (
@@ -171,20 +175,20 @@ export default function PersonalFinanceDashboard() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.5, delay: index * 0.1 }}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`flex items-center space-x-2 px-6 py-3 rounded-xl font-semibold transition-all duration-300 whitespace-nowrap ${
+                  className={`flex items-center space-x-3 px-8 py-4 rounded-2xl font-semibold transition-all duration-300 whitespace-nowrap relative ${
                     activeTab === tab.id
-                      ? `bg-gradient-to-r ${tab.color} text-white shadow-lg star-border`
-                      : 'text-gray-400 hover:text-white hover:bg-white/10'
+                      ? `bg-gradient-to-r ${tab.color} text-white shadow-2xl star-border`
+                      : 'text-gray-400 hover:text-white hover:bg-white/10 hover:shadow-lg'
                   }`}
                   whileHover={{ scale: 1.02, y: -2 }}
                   whileTap={{ scale: 0.98 }}
                 >
-                  <Icon className="w-5 h-5" />
-                  <span>{tab.label}</span>
+                  <Icon className="w-6 h-6" />
+                  <span className="text-lg">{tab.label}</span>
                   {activeTab === tab.id && (
                     <motion.div
                       layoutId="activeTab"
-                      className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent rounded-xl"
+                      className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent rounded-2xl"
                       initial={false}
                       transition={{ type: "spring", stiffness: 500, damping: 30 }}
                     />
@@ -197,7 +201,7 @@ export default function PersonalFinanceDashboard() {
       </motion.nav>
 
       {/* Main Content */}
-      <main className="px-4 pb-8">
+      <main className="px-6 pb-12">
         <AnimatePresence mode="wait">
           <motion.div
             key={activeTab}

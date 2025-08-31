@@ -124,21 +124,21 @@ export default function FinancialOverview() {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="flex justify-between items-center"
+        className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 mb-8"
       >
-        <div>
-          <h2 className="text-3xl font-bold gradient-text mb-2">Financial Overview</h2>
-          <p className="text-gray-400">Your complete financial snapshot</p>
+        <div className="text-center lg:text-left">
+          <h2 className="text-4xl lg:text-5xl font-bold gradient-text mb-3">Financial Overview</h2>
+          <p className="text-gray-400 text-lg">Your complete financial snapshot with real-time insights</p>
         </div>
-        <div className="flex space-x-2">
+        <div className="flex space-x-3 mx-auto lg:mx-0">
           {['week', 'month', 'year'].map((period) => (
             <motion.button
               key={period}
               onClick={() => setSelectedPeriod(period)}
-              className={`px-4 py-2 rounded-xl font-semibold transition-all ${
+              className={`px-6 py-3 rounded-2xl font-semibold transition-all text-lg ${
                 selectedPeriod === period
-                  ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white star-border'
-                  : 'glass text-gray-400 hover:text-white'
+                  ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white star-border shadow-2xl'
+                  : 'glass text-gray-400 hover:text-white hover:shadow-lg border border-white/10'
               }`}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
