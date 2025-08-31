@@ -5,11 +5,14 @@ import { getUserFromRequest } from './lib/auth';
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
+  console.log('🛡️ Middleware checking path:', pathname);
+
   // Public routes that don't require authentication
-  const publicRoutes = ['/login', '/register', '/api/auth/login', '/api/auth/register'];
+  const publicRoutes = ['/login', '/register', '/api/auth/login', '/api/auth/register', '/api/auth/logout'];
   
   // Check if the route is public
   if (publicRoutes.some(route => pathname.startsWith(route))) {
+    console.log('✅ Public route, allowing access');
     return NextResponse.next();
   }
 

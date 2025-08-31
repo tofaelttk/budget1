@@ -5,9 +5,12 @@ import { verifyPassword, createAuthResponse } from '@/lib/auth';
 
 export async function POST(request: NextRequest) {
   try {
+    console.log('🔄 Login endpoint hit');
     await connectToDatabase();
     
-    const { email, password } = await request.json();
+    const body = await request.json();
+    console.log('📄 Login data received:', { email: body.email, password: '[HIDDEN]' });
+    const { email, password } = body;
 
     // Validate required fields
     if (!email || !password) {

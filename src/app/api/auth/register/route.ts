@@ -5,9 +5,12 @@ import { hashPassword, createAuthResponse } from '@/lib/auth';
 
 export async function POST(request: NextRequest) {
   try {
+    console.log('🔄 Registration endpoint hit');
     await connectToDatabase();
     
-    const { email, password, firstName, lastName } = await request.json();
+    const body = await request.json();
+    console.log('📄 Registration data received:', { ...body, password: '[HIDDEN]' });
+    const { email, password, firstName, lastName } = body;
 
     // Validate required fields
     if (!email || !password || !firstName || !lastName) {

@@ -4,6 +4,8 @@ import { NextRequest } from 'next/server';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'HossainMdTofael1/2';
 
+console.log('🔐 JWT Secret configured:', JWT_SECRET ? 'Yes' : 'No');
+
 export interface JWTPayload {
   userId: string;
   email: string;
