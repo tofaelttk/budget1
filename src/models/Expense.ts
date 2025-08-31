@@ -1,90 +1,120 @@
-import mongoose, { Document, Schema } from 'mongoose';
+import mongoose, { Document, Model, Schema } from 'mongoose';
 
-export interface IExpense extends Document {
+export interface IExpenseCategory extends Document {
   userId: mongoose.Types.ObjectId;
-  category: 'tuition' | 'family-support' | 'subscription' | 'personal' | 'emergency' | 'other';
-  subcategory?: string;
   name: string;
-  amount: number;
-  frequency: 'weekly' | 'monthly' | 'semester' | 'yearly' | 'one-time';
-  dueDate?: Date;
-  isRecurring: boolean;
-  isFixed: boolean; // true for fixed expenses, false for variable
   description?: string;
+  budget: number;
+  spent: number;
+  isFixed: boolean;
+  icon: string;
+  color: string;
   isActive: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
 
-const ExpenseSchema: Schema = new Schema({
+export interface IExpense extends Document {
+  userId: mongoose.Types.ObjectId;
+  categoryId: mongoose.Types.ObjectId;
+  amount: number;
+  description: string;
+  date: Date;
+  isRecurring: boolean;
+  recurringFrequency?: 'weekly' | 'monthly' | 'yearly';
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+const ExpenseCategorySchema: Schema<IExpenseCategory> = new Schema({
   userId: {
     type: Schema.Types.ObjectId,
     ref: 'User',
-    required: true,
-  },
-  category: {
-    type: String,
-    enum: ['tuition', 'family-support', 'subscription', 'personal', 'emergency', 'other'],
-    required: [true, 'Expense category is required'],
-  },
-  subcategory: {
-    type: String,
-    trim: true,
+    required: true
   },
   name: {
     type: String,
-    required: [true, 'Expense name is required'],
-    trim: true,
-  },
-  amount: {
-    type: Number,
-    required: [true, 'Expense amount is required'],
-    min: [0, 'Expense amount cannot be negative'],
-  },
-  frequency: {
-    type: String,
-    enum: ['weekly', 'monthly', 'semester', 'yearly', 'one-time'],
-    required: [true, 'Expense frequency is required'],
-  },
-  dueDate: {
-    type: Date,
-  },
-  isRecurring: {
-    type: Boolean,
-    default: true,
-  },
-  isFixed: {
-    type: Boolean,
-    default: true,
+    required: true,
+    trim: true
   },
   description: {
     type: String,
-    trim: true,
+    trim: true
+  },
+  budget: {
+    type: Number,
+    required: true,
+    min: 0
+  },
+  spent: {
+    type: Number,
+    default: 0,
+    min: 0
+  },
+  isFixed: {
+    type: Boolean,
+    default: false
+  },
+  icon: {
+    type: String,
+    default: 'ShoppingCart'
+  },
+  color: {
+    type: String,
+    default: '#6366f1'
   },
   isActive: {
     type: Boolean,
-    default: true,
-  },
-}, {
-  timestamps: true,
-});
-
-// Virtual for monthly equivalent
-ExpenseSchema.virtual('monthlyEquivalent').get(function(this: IExpense) {
-  switch (this.frequency) {
-    case 'weekly':
-      return this.amount * 4.33; // Average weeks per month
-    case 'monthly':
-      return this.amount;
-    case 'semester':
-      return this.amount / 4; // Assuming 4 months per semester
-    case 'yearly':
-      return this.amount / 12;
-    case 'one-time':
-      return 0;
-    default:
-      return 0;
+    default: true
   }
+}, {
+  timestamps: true
 });
 
-export default mongoose.models.Expense || mongoose.model<IExpense>('Expense', ExpenseSchema);
+const ExpenseSchema: Schema<IExpense> = new Schema({
+  userId: {
+    type: Schema.Types.ObjectId,
+    ref: 'User',
+    required: true
+  },
+  categoryId: {
+    type: Schema.Types.ObjectId,
+    ref: 'ExpenseCategory',
+    required: true
+  },
+  amount: {
+    type: Number,
+    required: true,
+    min: 0
+  },
+  description: {
+    type: String,
+    required: true,
+    trim: true
+  },
+  date: {
+    type: Date,
+    required: true
+  },
+  isRecurring: {
+    type: Boolean,
+    default: false
+  },
+  recurringFrequency: {
+    type: String,
+    enum: ['weekly', 'monthly', 'yearly']
+  }
+}, {
+  timestamps: true
+});
+
+// Create indexes
+ExpenseCategorySchema.index({ userId: 1, isActive: 1 });
+ExpenseCategorySchema.index({ userId: 1, name: 1 });
+
+ExpenseSchema.index({ userId: 1, date: -1 });
+ExpenseSchema.index({ categoryId: 1, date: -1 });
+ExpenseSchema.index({ userId: 1, isRecurring: 1 });
+
+export const ExpenseCategory = (mongoose.models.ExpenseCategory as Model<IExpenseCategory>) || mongoose.model<IExpenseCategory>('ExpenseCategory', ExpenseCategorySchema);
+export const Expense = (mongoose.models.Expense as Model<IExpense>) || mongoose.model<IExpense>('Expense', ExpenseSchema);

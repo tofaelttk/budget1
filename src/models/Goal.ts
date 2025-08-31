@@ -1,85 +1,131 @@
-import mongoose, { Document, Schema } from 'mongoose';
+import mongoose, { Document, Model, Schema } from 'mongoose';
 
 export interface IGoal extends Document {
   userId: mongoose.Types.ObjectId;
   title: string;
-  description?: string;
+  description: string;
   targetAmount: number;
   currentAmount: number;
   targetDate: Date;
-  category: 'emergency-fund' | 'debt-payoff' | 'savings' | 'investment' | 'other';
-  priority: 'low' | 'medium' | 'high';
+  category: 'emergency' | 'vacation' | 'house' | 'car' | 'education' | 'debt' | 'investment' | 'other';
+  priority: 'high' | 'medium' | 'low';
+  color: string;
+  icon: string;
   isCompleted: boolean;
-  completedAt?: Date;
+  completedDate?: Date;
+  monthlyContribution: number;
   createdAt: Date;
   updatedAt: Date;
 }
 
-const GoalSchema: Schema = new Schema({
+export interface IContribution extends Document {
+  userId: mongoose.Types.ObjectId;
+  goalId: mongoose.Types.ObjectId;
+  amount: number;
+  date: Date;
+  description?: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+const GoalSchema: Schema<IGoal> = new Schema({
   userId: {
     type: Schema.Types.ObjectId,
     ref: 'User',
-    required: true,
+    required: true
   },
   title: {
     type: String,
-    required: [true, 'Goal title is required'],
-    trim: true,
+    required: true,
+    trim: true
   },
   description: {
     type: String,
-    trim: true,
+    trim: true
   },
   targetAmount: {
     type: Number,
-    required: [true, 'Target amount is required'],
-    min: [0, 'Target amount cannot be negative'],
+    required: true,
+    min: 0
   },
   currentAmount: {
     type: Number,
     default: 0,
-    min: [0, 'Current amount cannot be negative'],
+    min: 0
   },
   targetDate: {
     type: Date,
-    required: [true, 'Target date is required'],
+    required: true
   },
   category: {
     type: String,
-    enum: ['emergency-fund', 'debt-payoff', 'savings', 'investment', 'other'],
-    required: [true, 'Goal category is required'],
+    enum: ['emergency', 'vacation', 'house', 'car', 'education', 'debt', 'investment', 'other'],
+    required: true
   },
   priority: {
     type: String,
-    enum: ['low', 'medium', 'high'],
-    default: 'medium',
+    enum: ['high', 'medium', 'low'],
+    default: 'medium'
+  },
+  color: {
+    type: String,
+    default: '#6366f1'
+  },
+  icon: {
+    type: String,
+    default: 'Target'
   },
   isCompleted: {
     type: Boolean,
-    default: false,
+    default: false
   },
-  completedAt: {
-    type: Date,
+  completedDate: {
+    type: Date
   },
+  monthlyContribution: {
+    type: Number,
+    default: 0,
+    min: 0
+  }
 }, {
-  timestamps: true,
+  timestamps: true
 });
 
-// Virtual for progress percentage
-GoalSchema.virtual('progressPercentage').get(function(this: IGoal) {
-  return Math.min((this.currentAmount / this.targetAmount) * 100, 100);
+const ContributionSchema: Schema<IContribution> = new Schema({
+  userId: {
+    type: Schema.Types.ObjectId,
+    ref: 'User',
+    required: true
+  },
+  goalId: {
+    type: Schema.Types.ObjectId,
+    ref: 'Goal',
+    required: true
+  },
+  amount: {
+    type: Number,
+    required: true,
+    min: 0
+  },
+  date: {
+    type: Date,
+    required: true
+  },
+  description: {
+    type: String,
+    trim: true
+  }
+}, {
+  timestamps: true
 });
 
-// Virtual for remaining amount
-GoalSchema.virtual('remainingAmount').get(function(this: IGoal) {
-  return Math.max(this.targetAmount - this.currentAmount, 0);
-});
+// Create indexes
+GoalSchema.index({ userId: 1, isCompleted: 1 });
+GoalSchema.index({ userId: 1, targetDate: 1 });
+GoalSchema.index({ userId: 1, priority: 1 });
 
-// Virtual for days remaining
-GoalSchema.virtual('daysRemaining').get(function(this: IGoal) {
-  const now = new Date();
-  const timeDiff = this.targetDate.getTime() - now.getTime();
-  return Math.ceil(timeDiff / (1000 * 3600 * 24));
-});
+ContributionSchema.index({ userId: 1, date: -1 });
+ContributionSchema.index({ goalId: 1, date: -1 });
 
-export default mongoose.models.Goal || mongoose.model<IGoal>('Goal', GoalSchema);
+export const Goal = (mongoose.models.Goal as Model<IGoal>) || mongoose.model<IGoal>('Goal', GoalSchema);
+export const Contribution = (mongoose.models.Contribution as Model<IContribution>) || mongoose.model<IContribution>('Contribution', ContributionSchema);

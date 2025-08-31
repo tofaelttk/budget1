@@ -1,75 +1,104 @@
-import mongoose, { Document, Schema } from 'mongoose';
+import mongoose, { Document, Model, Schema } from 'mongoose';
 
-export interface IIncome extends Document {
+export interface IIncomeSource extends Document {
   userId: mongoose.Types.ObjectId;
-  source: string;
+  name: string;
+  type: 'salary' | 'freelance' | 'investment' | 'business' | 'other';
   amount: number;
-  frequency: 'weekly' | 'monthly' | 'yearly' | 'one-time';
-  dayOfWeek?: number; // 0-6 for weekly income (0 = Sunday)
-  dayOfMonth?: number; // 1-31 for monthly income
-  description?: string;
+  frequency: 'weekly' | 'biweekly' | 'monthly' | 'yearly';
+  nextPayment: Date;
   isActive: boolean;
+  color: string;
   createdAt: Date;
   updatedAt: Date;
 }
 
-const IncomeSchema: Schema = new Schema({
+export interface IIncomeRecord extends Document {
+  userId: mongoose.Types.ObjectId;
+  sourceId: mongoose.Types.ObjectId;
+  amount: number;
+  date: Date;
+  description?: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+const IncomeSourceSchema: Schema<IIncomeSource> = new Schema({
   userId: {
     type: Schema.Types.ObjectId,
     ref: 'User',
-    required: true,
+    required: true
   },
-  source: {
+  name: {
     type: String,
-    required: [true, 'Income source is required'],
-    trim: true,
+    required: true,
+    trim: true
+  },
+  type: {
+    type: String,
+    enum: ['salary', 'freelance', 'investment', 'business', 'other'],
+    required: true
   },
   amount: {
     type: Number,
-    required: [true, 'Income amount is required'],
-    min: [0, 'Income amount cannot be negative'],
+    required: true,
+    min: 0
   },
   frequency: {
     type: String,
-    enum: ['weekly', 'monthly', 'yearly', 'one-time'],
-    required: [true, 'Income frequency is required'],
+    enum: ['weekly', 'biweekly', 'monthly', 'yearly'],
+    required: true
   },
-  dayOfWeek: {
-    type: Number,
-    min: [0, 'Day of week must be 0-6'],
-    max: [6, 'Day of week must be 0-6'],
-  },
-  dayOfMonth: {
-    type: Number,
-    min: [1, 'Day of month must be 1-31'],
-    max: [31, 'Day of month must be 1-31'],
-  },
-  description: {
-    type: String,
-    trim: true,
+  nextPayment: {
+    type: Date,
+    required: true
   },
   isActive: {
     type: Boolean,
-    default: true,
+    default: true
   },
-}, {
-  timestamps: true,
-});
-
-// Virtual for monthly equivalent
-IncomeSchema.virtual('monthlyEquivalent').get(function(this: IIncome) {
-  switch (this.frequency) {
-    case 'weekly':
-      return this.amount * 4.33; // Average weeks per month
-    case 'monthly':
-      return this.amount;
-    case 'yearly':
-      return this.amount / 12;
-    case 'one-time':
-      return 0;
-    default:
-      return 0;
+  color: {
+    type: String,
+    default: '#10b981'
   }
+}, {
+  timestamps: true
 });
 
-export default mongoose.models.Income || mongoose.model<IIncome>('Income', IncomeSchema);
+const IncomeRecordSchema: Schema<IIncomeRecord> = new Schema({
+  userId: {
+    type: Schema.Types.ObjectId,
+    ref: 'User',
+    required: true
+  },
+  sourceId: {
+    type: Schema.Types.ObjectId,
+    ref: 'IncomeSource',
+    required: true
+  },
+  amount: {
+    type: Number,
+    required: true,
+    min: 0
+  },
+  date: {
+    type: Date,
+    required: true
+  },
+  description: {
+    type: String,
+    trim: true
+  }
+}, {
+  timestamps: true
+});
+
+// Create indexes
+IncomeSourceSchema.index({ userId: 1, isActive: 1 });
+IncomeSourceSchema.index({ userId: 1, nextPayment: 1 });
+
+IncomeRecordSchema.index({ userId: 1, date: -1 });
+IncomeRecordSchema.index({ sourceId: 1, date: -1 });
+
+export const IncomeSource = (mongoose.models.IncomeSource as Model<IIncomeSource>) || mongoose.model<IIncomeSource>('IncomeSource', IncomeSourceSchema);
+export const IncomeRecord = (mongoose.models.IncomeRecord as Model<IIncomeRecord>) || mongoose.model<IIncomeRecord>('IncomeRecord', IncomeRecordSchema);

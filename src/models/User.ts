@@ -1,39 +1,97 @@
-import mongoose, { Document, Schema } from 'mongoose';
+import mongoose, { Document, Model, Schema } from 'mongoose';
 
 export interface IUser extends Document {
   email: string;
+  name: string;
   password: string;
-  firstName: string;
-  lastName: string;
   createdAt: Date;
   updatedAt: Date;
+  preferences: {
+    currency: string;
+    dateFormat: string;
+    notifications: {
+      email: boolean;
+      push: boolean;
+      reminders: boolean;
+    };
+    theme: 'light' | 'dark' | 'auto';
+  };
+  profile: {
+    monthlyIncome: number;
+    emergencyFundGoal: number;
+    riskTolerance: 'low' | 'medium' | 'high';
+  };
 }
 
-const UserSchema: Schema = new Schema({
+const UserSchema: Schema<IUser> = new Schema({
   email: {
     type: String,
-    required: [true, 'Email is required'],
+    required: true,
     unique: true,
     lowercase: true,
-    trim: true,
+    trim: true
+  },
+  name: {
+    type: String,
+    required: true,
+    trim: true
   },
   password: {
     type: String,
-    required: [true, 'Password is required'],
-    minlength: [6, 'Password must be at least 6 characters'],
+    required: true,
+    minlength: 6
   },
-  firstName: {
-    type: String,
-    required: [true, 'First name is required'],
-    trim: true,
+  preferences: {
+    currency: {
+      type: String,
+      default: 'USD'
+    },
+    dateFormat: {
+      type: String,
+      default: 'MM/DD/YYYY'
+    },
+    notifications: {
+      email: {
+        type: Boolean,
+        default: true
+      },
+      push: {
+        type: Boolean,
+        default: true
+      },
+      reminders: {
+        type: Boolean,
+        default: true
+      }
+    },
+    theme: {
+      type: String,
+      enum: ['light', 'dark', 'auto'],
+      default: 'dark'
+    }
   },
-  lastName: {
-    type: String,
-    required: [true, 'Last name is required'],
-    trim: true,
-  },
+  profile: {
+    monthlyIncome: {
+      type: Number,
+      default: 0
+    },
+    emergencyFundGoal: {
+      type: Number,
+      default: 10000
+    },
+    riskTolerance: {
+      type: String,
+      enum: ['low', 'medium', 'high'],
+      default: 'medium'
+    }
+  }
 }, {
-  timestamps: true,
+  timestamps: true
 });
 
-export default mongoose.models.User || mongoose.model<IUser>('User', UserSchema);
+// Create indexes
+UserSchema.index({ email: 1 });
+UserSchema.index({ createdAt: -1 });
+
+// Export the model
+export default (mongoose.models.User as Model<IUser>) || mongoose.model<IUser>('User', UserSchema);
