@@ -7,8 +7,8 @@ export function middleware(request: NextRequest) {
 
   console.log('🛡️ Middleware checking path:', pathname);
 
-  // TEMPORARILY DISABLED - Allow all routes for debugging
-  console.log('⚠️ MIDDLEWARE TEMPORARILY DISABLED - ALLOWING ALL ROUTES');
+  // AUTHENTICATION DISABLED FOR DEVELOPMENT - Allow all routes
+  console.log('🚀 AUTHENTICATION DISABLED - ALLOWING ALL ROUTES FOR DEVELOPMENT');
   return NextResponse.next();
 
   // This code is temporarily commented out for debugging
