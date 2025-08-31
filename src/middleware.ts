@@ -1,0 +1,60 @@
+import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
+import { getUserFromRequest } from './lib/auth';
+
+export function middleware(request: NextRequest) {
+  const { pathname } = request.nextUrl;
+
+  // Public routes that don't require authentication
+  const publicRoutes = ['/login', '/register', '/api/auth/login', '/api/auth/register'];
+  
+  // Check if the route is public
+  if (publicRoutes.some(route => pathname.startsWith(route))) {
+    return NextResponse.next();
+  }
+
+  // For protected routes, check authentication
+  if (pathname.startsWith('/api/')) {
+    const user = getUserFromRequest(request);
+    if (!user) {
+      return NextResponse.json(
+        { error: 'Unauthorized' },
+        { status: 401 }
+      );
+    }
+    
+    // Add user info to headers for API routes
+    const requestHeaders = new Headers(request.headers);
+    requestHeaders.set('x-user-id', user.userId);
+    requestHeaders.set('x-user-email', user.email);
+    
+    return NextResponse.next({
+      request: {
+        headers: requestHeaders,
+      },
+    });
+  }
+
+  // For protected pages, redirect to login if not authenticated
+  if (pathname.startsWith('/dashboard') || pathname === '/') {
+    const user = getUserFromRequest(request);
+    if (!user) {
+      return NextResponse.redirect(new URL('/login', request.url));
+    }
+  }
+
+  return NextResponse.next();
+}
+
+export const config = {
+  matcher: [
+    /*
+     * Match all request paths except for the ones starting with:
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     * - public folder
+     */
+    '/((?!_next/static|_next/image|favicon.ico|public).*)',
+  ],
+};
