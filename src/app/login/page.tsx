@@ -50,9 +50,9 @@ export default function LoginPage() {
         setSuccess('Login successful! Redirecting...');
         console.log('✅ Token stored, redirecting to dashboard...');
         
-        // Add a small delay to show success message
+        // Force a page reload to ensure middleware picks up the new cookie
         setTimeout(() => {
-          router.push('/dashboard');
+          window.location.href = '/dashboard';
         }, 1000);
       } else {
         throw new Error('No authentication token received');

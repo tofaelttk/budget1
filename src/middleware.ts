@@ -16,6 +16,11 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
+  // Skip middleware for static files and Next.js internals
+  if (pathname.startsWith('/_next/') || pathname.startsWith('/favicon.ico') || pathname.includes('.')) {
+    return NextResponse.next();
+  }
+
   // For protected routes, check authentication
   if (pathname.startsWith('/api/')) {
     const user = getUserFromRequest(request);
@@ -38,8 +43,14 @@ export function middleware(request: NextRequest) {
     });
   }
 
-  // For protected pages, redirect to login if not authenticated
-  if (pathname.startsWith('/dashboard') || pathname === '/') {
+  // For protected pages, redirect to login if not authenticated  
+  if (pathname.startsWith('/dashboard')) {
+    console.log('🔍 Checking authentication for protected route:', pathname);
+    
+    // Get all cookies for debugging
+    const allCookies = request.cookies.getAll();
+    console.log('🍪 All cookies:', allCookies.map(c => `${c.name}=${c.value.substring(0, 20)}...`));
+    
     const user = getUserFromRequest(request);
     if (!user) {
       console.log('🔒 No user found, redirecting to login');

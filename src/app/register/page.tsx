@@ -90,8 +90,9 @@ export default function RegisterPage() {
         setSuccess('Account created successfully! Redirecting...');
         console.log('✅ Token stored, redirecting to dashboard...');
         
+        // Force a page reload to ensure middleware picks up the new cookie
         setTimeout(() => {
-          router.push('/dashboard');
+          window.location.href = '/dashboard';
         }, 1000);
       } else {
         throw new Error('No authentication token received');
