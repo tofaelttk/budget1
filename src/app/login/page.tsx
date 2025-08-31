@@ -50,10 +50,9 @@ export default function LoginPage() {
         setSuccess('Login successful! Redirecting...');
         console.log('✅ Token stored, redirecting to dashboard...');
         
-        // Force a page reload to ensure middleware picks up the new cookie
-        setTimeout(() => {
-          window.location.href = '/dashboard';
-        }, 1000);
+        // Immediate redirect to test dashboard first to verify it works
+        console.log('🔄 Redirecting to test dashboard to verify functionality...');
+        window.location.href = '/test-dashboard';
       } else {
         throw new Error('No authentication token received');
       }

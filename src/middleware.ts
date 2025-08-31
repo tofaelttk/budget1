@@ -7,6 +7,12 @@ export function middleware(request: NextRequest) {
 
   console.log('🛡️ Middleware checking path:', pathname);
 
+  // TEMPORARILY DISABLED - Allow all routes for debugging
+  console.log('⚠️ MIDDLEWARE TEMPORARILY DISABLED - ALLOWING ALL ROUTES');
+  return NextResponse.next();
+
+  // This code is temporarily commented out for debugging
+  /*
   // Public routes that don't require authentication
   const publicRoutes = ['/login', '/register', '/api/auth/login', '/api/auth/register', '/api/auth/logout', '/api/test-db'];
   
@@ -61,6 +67,7 @@ export function middleware(request: NextRequest) {
   }
 
   return NextResponse.next();
+  */
 }
 
 export const config = {

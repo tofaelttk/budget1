@@ -34,19 +34,33 @@ export default function DashboardLayout({
 }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [user, setUser] = useState<{ email: string; name?: string } | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
 
   useEffect(() => {
     // Check authentication and get user data
-    const token = localStorage.getItem('auth-token');
-    if (!token) {
-      router.push('/login');
-      return;
-    }
+    console.log('🔍 Dashboard layout checking authentication...');
+    
+    try {
+      const token = localStorage.getItem('auth-token');
+      console.log('🔍 Token from localStorage:', token ? 'Found' : 'Not found');
+      
+      if (!token) {
+        console.log('❌ No token found, redirecting to login...');
+        router.push('/login');
+        return;
+      }
 
-    // TODO: Decode token to get user info
-    // For now, we'll use a placeholder
-    setUser({ email: 'user@example.com', name: 'User' });
+      // TODO: Decode token to get user info
+      // For now, we'll use a placeholder
+      console.log('✅ Token found, setting user...');
+      setUser({ email: 'user@example.com', name: 'User' });
+      setIsLoading(false);
+    } catch (error) {
+      console.error('❌ Error in dashboard layout:', error);
+      setIsLoading(false);
+      router.push('/login');
+    }
   }, [router]);
 
   const handleLogout = async () => {
@@ -62,10 +76,23 @@ export default function DashboardLayout({
     }
   };
 
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600 dark:text-gray-400">Loading dashboard...</p>
+        </div>
+      </div>
+    );
+  }
+
   if (!user) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
+        <div className="text-center">
+          <p className="text-gray-600 dark:text-gray-400">Redirecting to login...</p>
+        </div>
       </div>
     );
   }
