@@ -6,8 +6,7 @@ import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card';
-import { LogIn, Eye, EyeOff, DollarSign, TrendingUp, Shield, AlertCircle } from 'lucide-react';
+import { Eye, EyeOff, DollarSign, AlertCircle, CheckCircle } from 'lucide-react';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -15,275 +14,276 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setError('');
+    setSuccess('');
 
     try {
-      console.log('🔄 Attempting login...');
+      console.log('🔄 Attempting login with:', { email, password: '[HIDDEN]' });
+      
       const response = await fetch('/api/auth/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ email, password }),
+        credentials: 'include', // Include cookies
       });
 
       console.log('📡 Response status:', response.status);
+      console.log('📡 Response headers:', Object.fromEntries(response.headers.entries()));
+      
       const data = await response.json();
       console.log('📄 Response data:', data);
 
       if (!response.ok) {
-        throw new Error(data.error || 'Login failed');
+        throw new Error(data.error || `HTTP ${response.status}: Login failed`);
       }
 
-      // Store token in localStorage for client-side usage
       if (data.token) {
         localStorage.setItem('auth-token', data.token);
+        setSuccess('Login successful! Redirecting...');
         console.log('✅ Token stored, redirecting to dashboard...');
-        router.push('/dashboard');
+        
+        // Add a small delay to show success message
+        setTimeout(() => {
+          router.push('/dashboard');
+        }, 1000);
       } else {
-        throw new Error('No token received');
+        throw new Error('No authentication token received');
       }
     } catch (error) {
       console.error('❌ Login error:', error);
-      setError(error instanceof Error ? error.message : 'An error occurred');
+      setError(error instanceof Error ? error.message : 'Login failed. Please try again.');
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center p-4">
-      <div className="w-full max-w-6xl mx-auto">
-        <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
-          
-          {/* Left Side - Branding & Features */}
-          <motion.div
-            initial={{ opacity: 0, x: -50 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.6 }}
-            className="space-y-8 text-center lg:text-left"
-          >
-            {/* Logo & Brand */}
-            <div>
-              <motion.div
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
-                className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl mb-6"
-              >
-                <DollarSign className="w-8 h-8 text-white" />
-              </motion.div>
-              <h1 className="text-4xl lg:text-5xl font-bold text-gray-900 dark:text-white mb-4">
-                BudgetPi
-              </h1>
-              <p className="text-xl text-gray-600 dark:text-gray-400 mb-8">
-                Your personal finance companion for smarter money management
-              </p>
-            </div>
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
+      {/* Background Pattern */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-blue-50 dark:bg-blue-900/20 rounded-full blur-3xl opacity-70"></div>
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-purple-50 dark:bg-purple-900/20 rounded-full blur-3xl opacity-70"></div>
+      </div>
 
-            {/* Features */}
-            <div className="space-y-6 max-w-md mx-auto lg:mx-0">
-              {[
-                {
-                  icon: DollarSign,
-                  title: 'Smart Budgeting',
-                  description: 'Track your expenses and income with intelligent categorization'
-                },
-                {
-                  icon: TrendingUp,
-                  title: 'Debt Management',
-                  description: 'Optimize your debt payoff strategy with our calculators'
-                },
-                {
-                  icon: Shield,
-                  title: 'Secure & Private',
-                  description: 'Bank-level security to protect your financial data'
-                }
-              ].map((feature, index) => (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.4 + index * 0.1 }}
-                  className="flex items-start space-x-4 p-4 rounded-xl bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm"
-                >
-                  <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-lg flex items-center justify-center">
-                    <feature.icon className="w-6 h-6 text-white" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-gray-900 dark:text-white mb-1">
-                      {feature.title}
-                    </h3>
-                    <p className="text-gray-600 dark:text-gray-400 text-sm">
-                      {feature.description}
-                    </p>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
+      <div className="relative z-10 min-h-screen flex">
+        {/* Left Side - Branding */}
+        <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 relative overflow-hidden">
+          {/* Decorative Elements */}
+          <div className="absolute inset-0">
+            <div className="absolute top-20 left-20 w-32 h-32 bg-white/10 rounded-full blur-xl"></div>
+            <div className="absolute bottom-20 right-20 w-24 h-24 bg-white/10 rounded-full blur-xl"></div>
+            <div className="absolute top-1/2 left-1/3 w-16 h-16 bg-white/5 rounded-full blur-xl"></div>
+          </div>
 
-            {/* Stats */}
+          <div className="relative z-10 flex flex-col justify-center px-20 text-white">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.8 }}
-              className="grid grid-cols-3 gap-4 pt-8 max-w-md mx-auto lg:mx-0"
+              transition={{ duration: 0.8 }}
             >
-              <div className="text-center">
-                <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">99.9%</div>
-                <div className="text-xs text-gray-500 dark:text-gray-400">Uptime</div>
+              <div className="flex items-center mb-8">
+                <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center mr-4">
+                  <DollarSign className="w-6 h-6" />
+                </div>
+                <h1 className="text-3xl font-bold">BudgetPi</h1>
               </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-green-600 dark:text-green-400">10k+</div>
-                <div className="text-xs text-gray-500 dark:text-gray-400">Users</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">$2M+</div>
-                <div className="text-xs text-gray-500 dark:text-gray-400">Tracked</div>
+              
+              <h2 className="text-4xl font-bold mb-6 leading-tight">
+                Take control of your<br />
+                financial future
+              </h2>
+              
+              <p className="text-xl opacity-90 mb-12 leading-relaxed">
+                Smart budgeting, debt management, and financial insights
+                all in one beautiful platform.
+              </p>
+
+              {/* Features */}
+              <div className="space-y-4">
+                {[
+                  '🎯 Smart debt payoff strategies',
+                  '📊 Beautiful financial visualizations', 
+                  '🔒 Bank-level security & privacy',
+                  '📱 Works on all your devices'
+                ].map((feature, index) => (
+                  <motion.div
+                    key={index}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 1 + index * 0.1 }}
+                    className="flex items-center text-lg opacity-90"
+                  >
+                    <span>{feature}</span>
+                  </motion.div>
+                ))}
               </div>
             </motion.div>
-          </motion.div>
+          </div>
+        </div>
 
-          {/* Right Side - Login Form */}
+        {/* Right Side - Login Form */}
+        <div className="w-full lg:w-1/2 flex items-center justify-center p-8">
           <motion.div
-            initial={{ opacity: 0, x: 50 }}
+            initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="w-full max-w-md mx-auto"
+            transition={{ duration: 0.6 }}
+            className="w-full max-w-md"
           >
-            <Card className="border-0 shadow-2xl bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl">
-              <CardHeader className="text-center pb-6">
-                <motion.div
-                  initial={{ scale: 0, rotate: -180 }}
-                  animate={{ scale: 1, rotate: 0 }}
-                  transition={{ delay: 0.4, type: 'spring', stiffness: 200 }}
-                  className="mx-auto w-12 h-12 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-full flex items-center justify-center mb-4"
-                >
-                  <LogIn className="w-6 h-6 text-white" />
-                </motion.div>
-                <CardTitle className="text-2xl font-bold text-gray-900 dark:text-white">
-                  Welcome Back
-                </CardTitle>
-                <CardDescription className="text-gray-600 dark:text-gray-400">
-                  Sign in to your account to continue your financial journey
-                </CardDescription>
-              </CardHeader>
-              
-              <CardContent className="space-y-6">
-                <form onSubmit={handleSubmit} className="space-y-4">
-                  {error && (
-                    <motion.div
-                      initial={{ opacity: 0, scale: 0.95 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      className="p-3 text-sm text-red-600 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg flex items-center space-x-2"
-                    >
-                      <AlertCircle className="w-4 h-4 flex-shrink-0" />
-                      <span>{error}</span>
-                    </motion.div>
-                  )}
-                  
-                  <div className="space-y-2">
-                    <label htmlFor="email" className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                      Email Address
-                    </label>
-                    <Input
-                      id="email"
-                      type="email"
-                      placeholder="you@example.com"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      required
-                      disabled={isLoading}
-                      className="h-12"
-                    />
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <label htmlFor="password" className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                      Password
-                    </label>
-                    <div className="relative">
-                      <Input
-                        id="password"
-                        type={showPassword ? 'text' : 'password'}
-                        placeholder="Enter your password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        required
-                        disabled={isLoading}
-                        className="h-12 pr-12"
-                      />
-                      <button
-                        type="button"
-                        className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
-                        onClick={() => setShowPassword(!showPassword)}
-                      >
-                        {showPassword ? (
-                          <EyeOff className="h-5 w-5" />
-                        ) : (
-                          <Eye className="h-5 w-5" />
-                        )}
-                      </button>
-                    </div>
-                  </div>
+            {/* Mobile Logo */}
+            <div className="lg:hidden text-center mb-12">
+              <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-3xl mb-4">
+                <DollarSign className="w-8 h-8 text-white" />
+              </div>
+              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">BudgetPi</h1>
+            </div>
 
-                  <div className="flex items-center justify-between">
-                    <label className="flex items-center space-x-2 text-sm">
-                      <input
-                        type="checkbox"
-                        className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                      />
-                      <span className="text-gray-600 dark:text-gray-400">Remember me</span>
-                    </label>
-                    <Link
-                      href="/forgot-password"
-                      className="text-sm text-blue-600 dark:text-blue-400 hover:underline"
-                    >
-                      Forgot password?
-                    </Link>
-                  </div>
+            <div className="text-center mb-10">
+              <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+                Welcome back
+              </h2>
+              <p className="text-gray-600 dark:text-gray-400">
+                Sign in to continue to your dashboard
+              </p>
+            </div>
 
-                  <Button
-                    type="submit"
-                    className="w-full h-12 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-medium rounded-lg transition-all duration-200"
-                    disabled={isLoading}
-                  >
-                    {isLoading ? (
-                      <div className="flex items-center space-x-2">
-                        <motion.div
-                          animate={{ rotate: 360 }}
-                          transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
-                          className="w-4 h-4 border-2 border-white border-t-transparent rounded-full"
-                        />
-                        <span>Signing in...</span>
-                      </div>
-                    ) : (
-                      <div className="flex items-center space-x-2">
-                        <LogIn className="w-4 h-4" />
-                        <span>Sign In</span>
-                      </div>
-                    )}
-                  </Button>
-                </form>
-
-                <div className="text-center">
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
-                    Don&apos;t have an account?{' '}
-                    <Link
-                      href="/register"
-                      className="font-medium text-blue-600 dark:text-blue-400 hover:underline"
-                    >
-                      Create account
-                    </Link>
-                  </p>
+            {/* Status Messages */}
+            {error && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-2xl"
+              >
+                <div className="flex items-center space-x-3">
+                  <AlertCircle className="w-5 h-5 text-red-600 dark:text-red-400 flex-shrink-0" />
+                  <p className="text-sm text-red-700 dark:text-red-300">{error}</p>
                 </div>
-              </CardContent>
-            </Card>
+              </motion.div>
+            )}
+
+            {success && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="mb-6 p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-2xl"
+              >
+                <div className="flex items-center space-x-3">
+                  <CheckCircle className="w-5 h-5 text-green-600 dark:text-green-400 flex-shrink-0" />
+                  <p className="text-sm text-green-700 dark:text-green-300">{success}</p>
+                </div>
+              </motion.div>
+            )}
+
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <div>
+                <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Email
+                </label>
+                <Input
+                  id="email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="Enter your email"
+                  required
+                  disabled={isLoading}
+                  className="h-14 text-base bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                />
+              </div>
+
+              <div>
+                <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Password
+                </label>
+                <div className="relative">
+                  <Input
+                    id="password"
+                    type={showPassword ? 'text' : 'password'}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="Enter your password"
+                    required
+                    disabled={isLoading}
+                    className="h-14 text-base bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 pr-12"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+                  >
+                    {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                  </button>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between">
+                <label className="flex items-center">
+                  <input
+                    type="checkbox"
+                    className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                  />
+                  <span className="ml-2 text-sm text-gray-600 dark:text-gray-400">
+                    Remember me
+                  </span>
+                </label>
+                <Link
+                  href="/forgot-password"
+                  className="text-sm text-blue-600 hover:text-blue-500 dark:text-blue-400 font-medium"
+                >
+                  Forgot password?
+                </Link>
+              </div>
+
+              <Button
+                type="submit"
+                disabled={isLoading}
+                className="w-full h-14 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold rounded-2xl transition-all duration-200 transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+              >
+                {isLoading ? (
+                  <div className="flex items-center justify-center space-x-2">
+                    <motion.div
+                      animate={{ rotate: 360 }}
+                      transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+                      className="w-5 h-5 border-2 border-white border-t-transparent rounded-full"
+                    />
+                    <span>Signing in...</span>
+                  </div>
+                ) : (
+                  'Sign In'
+                )}
+              </Button>
+            </form>
+
+            <div className="mt-8 text-center">
+              <p className="text-gray-600 dark:text-gray-400">
+                Don't have an account?{' '}
+                <Link
+                  href="/register"
+                  className="text-blue-600 hover:text-blue-500 dark:text-blue-400 font-semibold"
+                >
+                  Create one now
+                </Link>
+              </p>
+            </div>
+
+            {/* Trust Indicators */}
+            <div className="mt-12 text-center">
+              <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">
+                Trusted by thousands of users
+              </p>
+              <div className="flex justify-center space-x-8 opacity-40">
+                <div className="text-xs">🔒 256-bit SSL</div>
+                <div className="text-xs">🛡️ SOC 2 Compliant</div>
+                <div className="text-xs">⭐ 4.9/5 Rating</div>
+              </div>
+            </div>
           </motion.div>
         </div>
       </div>

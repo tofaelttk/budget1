@@ -42,7 +42,10 @@ export function middleware(request: NextRequest) {
   if (pathname.startsWith('/dashboard') || pathname === '/') {
     const user = getUserFromRequest(request);
     if (!user) {
+      console.log('🔒 No user found, redirecting to login');
       return NextResponse.redirect(new URL('/login', request.url));
+    } else {
+      console.log('✅ User authenticated:', user.email);
     }
   }
 
