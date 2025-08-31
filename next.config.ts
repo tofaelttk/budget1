@@ -9,9 +9,7 @@ const nextConfig: NextConfig = {
     NEXTAUTH_URL: process.env.NEXTAUTH_URL || 'http://localhost:3000',
     NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET || 'HossainMdTofael1/2Budget',
   },
-  experimental: {
-    serverComponentsExternalPackages: ['mongoose'],
-  },
+  serverExternalPackages: ['mongoose'],
 }
 
 export default nextConfig
