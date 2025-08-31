@@ -7,7 +7,7 @@ import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card';
-import { LogIn, Eye, EyeOff, DollarSign, Sparkles, Shield, TrendingUp } from 'lucide-react';
+import { LogIn, Eye, EyeOff, DollarSign, TrendingUp, Shield, AlertCircle } from 'lucide-react';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -56,37 +56,20 @@ export default function LoginPage() {
     }
   };
 
-  const features = [
-    {
-      icon: DollarSign,
-      title: 'Smart Budgeting',
-      description: 'Track your expenses and income with intelligent categorization'
-    },
-    {
-      icon: TrendingUp,
-      title: 'Debt Management',
-      description: 'Optimize your debt payoff strategy with our calculators'
-    },
-    {
-      icon: Shield,
-      title: 'Secure & Private',
-      description: 'Bank-level security to protect your financial data'
-    }
-  ];
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
-      <div className="container mx-auto px-4 py-8">
-        <div className="grid lg:grid-cols-2 gap-12 items-center min-h-screen">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center p-4">
+      <div className="w-full max-w-6xl mx-auto">
+        <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+          
           {/* Left Side - Branding & Features */}
           <motion.div
             initial={{ opacity: 0, x: -50 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6 }}
-            className="space-y-8"
+            className="space-y-8 text-center lg:text-left"
           >
             {/* Logo & Brand */}
-            <div className="text-center lg:text-left">
+            <div>
               <motion.div
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
@@ -95,7 +78,7 @@ export default function LoginPage() {
               >
                 <DollarSign className="w-8 h-8 text-white" />
               </motion.div>
-              <h1 className="text-4xl lg:text-5xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent mb-4">
+              <h1 className="text-4xl lg:text-5xl font-bold text-gray-900 dark:text-white mb-4">
                 BudgetPi
               </h1>
               <p className="text-xl text-gray-600 dark:text-gray-400 mb-8">
@@ -104,14 +87,30 @@ export default function LoginPage() {
             </div>
 
             {/* Features */}
-            <div className="space-y-6">
-              {features.map((feature, index) => (
+            <div className="space-y-6 max-w-md mx-auto lg:mx-0">
+              {[
+                {
+                  icon: DollarSign,
+                  title: 'Smart Budgeting',
+                  description: 'Track your expenses and income with intelligent categorization'
+                },
+                {
+                  icon: TrendingUp,
+                  title: 'Debt Management',
+                  description: 'Optimize your debt payoff strategy with our calculators'
+                },
+                {
+                  icon: Shield,
+                  title: 'Secure & Private',
+                  description: 'Bank-level security to protect your financial data'
+                }
+              ].map((feature, index) => (
                 <motion.div
                   key={index}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.4 + index * 0.1 }}
-                  className="flex items-start space-x-4 p-4 rounded-xl bg-white/50 dark:bg-slate-800/50 backdrop-blur-sm"
+                  className="flex items-start space-x-4 p-4 rounded-xl bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm"
                 >
                   <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-lg flex items-center justify-center">
                     <feature.icon className="w-6 h-6 text-white" />
@@ -133,7 +132,7 @@ export default function LoginPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.8 }}
-              className="grid grid-cols-3 gap-4 pt-8"
+              className="grid grid-cols-3 gap-4 pt-8 max-w-md mx-auto lg:mx-0"
             >
               <div className="text-center">
                 <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">99.9%</div>
@@ -157,8 +156,8 @@ export default function LoginPage() {
             transition={{ duration: 0.6, delay: 0.2 }}
             className="w-full max-w-md mx-auto"
           >
-            <Card className="border-0 shadow-2xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl">
-              <CardHeader className="space-y-1 text-center pb-8">
+            <Card className="border-0 shadow-2xl bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl">
+              <CardHeader className="text-center pb-6">
                 <motion.div
                   initial={{ scale: 0, rotate: -180 }}
                   animate={{ scale: 1, rotate: 0 }}
@@ -181,9 +180,9 @@ export default function LoginPage() {
                     <motion.div
                       initial={{ opacity: 0, scale: 0.95 }}
                       animate={{ opacity: 1, scale: 1 }}
-                      className="p-4 text-sm text-red-600 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg flex items-center space-x-2"
+                      className="p-3 text-sm text-red-600 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg flex items-center space-x-2"
                     >
-                      <div className="w-2 h-2 bg-red-600 rounded-full"></div>
+                      <AlertCircle className="w-4 h-4 flex-shrink-0" />
                       <span>{error}</span>
                     </motion.div>
                   )}
@@ -200,7 +199,7 @@ export default function LoginPage() {
                       onChange={(e) => setEmail(e.target.value)}
                       required
                       disabled={isLoading}
-                      className="h-12 bg-white/50 dark:bg-slate-700/50 border-gray-200 dark:border-slate-600 focus:border-blue-500 dark:focus:border-blue-400"
+                      className="h-12"
                     />
                   </div>
                   
@@ -217,7 +216,7 @@ export default function LoginPage() {
                         onChange={(e) => setPassword(e.target.value)}
                         required
                         disabled={isLoading}
-                        className="h-12 bg-white/50 dark:bg-slate-700/50 border-gray-200 dark:border-slate-600 focus:border-blue-500 dark:focus:border-blue-400 pr-12"
+                        className="h-12 pr-12"
                       />
                       <button
                         type="button"
@@ -237,7 +236,7 @@ export default function LoginPage() {
                     <label className="flex items-center space-x-2 text-sm">
                       <input
                         type="checkbox"
-                        className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                        className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                       />
                       <span className="text-gray-600 dark:text-gray-400">Remember me</span>
                     </label>
@@ -251,7 +250,7 @@ export default function LoginPage() {
 
                   <Button
                     type="submit"
-                    className="w-full h-12 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-medium rounded-lg transition-all duration-200 transform hover:scale-[1.02]"
+                    className="w-full h-12 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-medium rounded-lg transition-all duration-200"
                     disabled={isLoading}
                   >
                     {isLoading ? (
@@ -272,47 +271,19 @@ export default function LoginPage() {
                   </Button>
                 </form>
 
-                <div className="relative">
-                  <div className="absolute inset-0 flex items-center">
-                    <div className="w-full border-t border-gray-200 dark:border-slate-600"></div>
-                  </div>
-                  <div className="relative flex justify-center text-sm">
-                    <span className="px-2 bg-white dark:bg-slate-800 text-gray-500 dark:text-gray-400">
-                      New to BudgetPi?
-                    </span>
-                  </div>
+                <div className="text-center">
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    Don&apos;t have an account?{' '}
+                    <Link
+                      href="/register"
+                      className="font-medium text-blue-600 dark:text-blue-400 hover:underline"
+                    >
+                      Create account
+                    </Link>
+                  </p>
                 </div>
-
-                <Link href="/register">
-                  <Button
-                    variant="outline"
-                    className="w-full h-12 border-2 border-gray-200 dark:border-slate-600 hover:border-blue-300 dark:hover:border-blue-500 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 font-medium rounded-lg transition-all duration-200"
-                  >
-                    <div className="flex items-center space-x-2">
-                      <Sparkles className="w-4 h-4" />
-                      <span>Create Account</span>
-                    </div>
-                  </Button>
-                </Link>
               </CardContent>
             </Card>
-
-            {/* Trust Indicators */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 1 }}
-              className="mt-8 text-center"
-            >
-              <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">
-                Trusted by thousands of users worldwide
-              </p>
-              <div className="flex items-center justify-center space-x-6 opacity-60">
-                <div className="w-8 h-8 bg-gray-200 dark:bg-slate-700 rounded"></div>
-                <div className="w-8 h-8 bg-gray-200 dark:bg-slate-700 rounded"></div>
-                <div className="w-8 h-8 bg-gray-200 dark:bg-slate-700 rounded"></div>
-              </div>
-            </motion.div>
           </motion.div>
         </div>
       </div>
