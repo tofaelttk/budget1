@@ -40,8 +40,8 @@ const Select = forwardRef<HTMLSelectElement, SelectProps>(({
       )}
       <select
         ref={ref}
-        value={value}
-        onChange={onChange}
+        value={value || ''}
+        onChange={onChange || (() => {})}
         required={required}
         disabled={disabled}
         className={`form-control ${error ? 'border-red-500 focus:border-red-500' : ''} ${className}`}

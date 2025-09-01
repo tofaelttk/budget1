@@ -27,8 +27,10 @@ const Input = forwardRef<HTMLInputElement, InputProps>(({
   error,
   helperText
 }, ref) => {
-  // Handle empty number inputs properly
-  const displayValue = type === 'number' && value === 0 ? '' : value;
+  // Handle empty number inputs properly - ensure controlled input
+  const displayValue = value === undefined || value === null ? '' : 
+                      (type === 'number' && value === 0) ? '' : 
+                      String(value);
 
   return (
     <div className="field">
@@ -42,7 +44,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(({
         ref={ref}
         type={type}
         value={displayValue}
-        onChange={onChange}
+        onChange={onChange || (() => {})}
         placeholder={placeholder}
         required={required}
         disabled={disabled}
