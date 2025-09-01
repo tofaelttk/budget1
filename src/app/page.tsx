@@ -39,7 +39,7 @@ interface SplashEffect {
 export default function PersonalFinanceDashboard() {
   const [activeTab, setActiveTab] = useState('overview');
   const [splashes, setSplashes] = useState<SplashEffect[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     // Simulate loading
