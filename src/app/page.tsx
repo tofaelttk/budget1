@@ -11,7 +11,12 @@ import {
   BarChart3,
   PieChart,
   Settings,
-  Bell
+  Bell,
+  Calculator,
+  FileText,
+  Calendar,
+  Wallet,
+  TrendingDown
 } from 'lucide-react';
 import CreditCardManager from '@/components/CreditCardManager';
 import IncomeTracker from '@/components/IncomeTracker';
@@ -20,6 +25,10 @@ import FinancialOverview from '@/components/FinancialOverview';
 import GoalTracker from '@/components/GoalTracker';
 import SmartSuggestions from '@/components/SmartSuggestions';
 import AnalyticsDashboard from '@/components/AnalyticsDashboard';
+import BudgetPlanner from '@/components/BudgetPlanner';
+import DebtCalculator from '@/components/DebtCalculator';
+import Reports from '@/components/Reports';
+import BillTracker from '@/components/BillTracker';
 
 interface SplashEffect {
   id: number;
@@ -64,6 +73,10 @@ export default function PersonalFinanceDashboard() {
     { id: 'income', label: 'Income', icon: TrendingUp, color: 'from-green-500 to-teal-600' },
     { id: 'expenses', label: 'Expenses', icon: DollarSign, color: 'from-orange-500 to-red-600' },
     { id: 'goals', label: 'Goals', icon: Target, color: 'from-indigo-500 to-blue-600' },
+    { id: 'budget', label: 'Budget Planner', icon: Wallet, color: 'from-emerald-500 to-teal-600' },
+    { id: 'bills', label: 'Bill Tracker', icon: Calendar, color: 'from-rose-500 to-pink-600' },
+    { id: 'calculator', label: 'Debt Calculator', icon: Calculator, color: 'from-amber-500 to-orange-600' },
+    { id: 'reports', label: 'Reports', icon: FileText, color: 'from-violet-500 to-purple-600' },
     { id: 'analytics', label: 'Analytics', icon: PieChart, color: 'from-teal-500 to-cyan-600' },
   ];
 
@@ -219,6 +232,10 @@ export default function PersonalFinanceDashboard() {
             {activeTab === 'income' && <IncomeTracker />}
             {activeTab === 'expenses' && <ExpenseCategories />}
             {activeTab === 'goals' && <GoalTracker />}
+            {activeTab === 'budget' && <BudgetPlanner />}
+            {activeTab === 'bills' && <BillTracker />}
+            {activeTab === 'calculator' && <DebtCalculator />}
+            {activeTab === 'reports' && <Reports />}
             {activeTab === 'analytics' && <AnalyticsDashboard />}
           </motion.div>
         </AnimatePresence>

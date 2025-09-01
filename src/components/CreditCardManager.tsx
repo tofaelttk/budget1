@@ -15,8 +15,14 @@ import {
   Target,
   Zap,
   Calculator,
-  PiggyBank
+  PiggyBank,
+  Save,
+  X
 } from 'lucide-react';
+import Button from '@/components/ui/Button';
+import Input from '@/components/ui/Input';
+import Select from '@/components/ui/Select';
+import Modal from '@/components/ui/Modal';
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 
 interface CreditCardData {
@@ -77,6 +83,8 @@ export default function CreditCardManager() {
 
   const [showAddCard, setShowAddCard] = useState(false);
   const [selectedCard, setSelectedCard] = useState<string | null>(null);
+  const [editingCard, setEditingCard] = useState<string | null>(null);
+  const [editFormData, setEditFormData] = useState<Partial<CreditCardData>>({});
   const [paymentStrategy, setPaymentStrategy] = useState<PaymentStrategy>({
     type: 'minimum',
     extraPayment: 0
@@ -85,11 +93,11 @@ export default function CreditCardManager() {
 
   const [newCard, setNewCard] = useState<Partial<CreditCardData>>({
     name: '',
-    balance: 0,
-    creditLimit: 0,
-    minimumPayment: 0,
+    balance: undefined,
+    creditLimit: undefined,
+    minimumPayment: undefined,
     dueDate: '',
-    interestRate: 0,
+    interestRate: undefined,
     color: 'from-blue-500 to-cyan-600'
   });
 
@@ -130,6 +138,20 @@ export default function CreditCardManager() {
 
   const deleteCard = (id: string) => {
     setCards(cards.filter(card => card.id !== id));
+  };
+
+  const updateCard = (id: string, updates: Partial<CreditCardData>) => {
+    setCards(cards.map(card => 
+      card.id === id ? { ...card, ...updates } : card
+    ));
+    setEditingCard(null);
+    setEditFormData({});
+  };
+
+  const saveEditedCard = () => {
+    if (editingCard && editFormData.name && editFormData.creditLimit && editFormData.dueDate) {
+      updateCard(editingCard, editFormData);
+    }
   };
 
   const calculateUtilization = (balance: number, limit: number) => {
@@ -285,16 +307,19 @@ export default function CreditCardManager() {
                   </div>
                   <div className="flex space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
                     <motion.button
-                      onClick={() => setSelectedCard(card.id)}
-                      className="p-2 glass rounded-lg hover:bg-white/20"
+                      onClick={() => {
+                        setEditingCard(card.id);
+                        setEditFormData(card);
+                      }}
+                      className="p-3 glass rounded-xl hover:bg-blue-500/20 border border-blue-500/30"
                       whileHover={{ scale: 1.1 }}
                       whileTap={{ scale: 0.9 }}
                     >
-                      <Edit3 className="w-4 h-4" />
+                      <Edit3 className="w-4 h-4 text-blue-400" />
                     </motion.button>
                     <motion.button
                       onClick={() => deleteCard(card.id)}
-                      className="p-2 glass rounded-lg hover:bg-red-500/20"
+                      className="p-3 glass rounded-xl hover:bg-red-500/20 border border-red-500/30"
                       whileHover={{ scale: 1.1 }}
                       whileTap={{ scale: 0.9 }}
                     >
@@ -575,6 +600,110 @@ export default function CreditCardManager() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Edit Card Modal */}
+      <Modal
+        isOpen={!!editingCard}
+        onClose={() => {
+          setEditingCard(null);
+          setEditFormData({});
+        }}
+        title="Edit Credit Card"
+        maxWidth="lg"
+      >
+        <div className="space-y-6">
+          <Input
+            label="Card Name"
+            placeholder="e.g., Chase Sapphire"
+            value={editFormData.name || ''}
+            onChange={(e) => setEditFormData({ ...editFormData, name: e.target.value })}
+            required
+          />
+          
+          <div className="grid grid-cols-2 gap-4">
+            <Input
+              label="Current Balance"
+              type="number"
+              placeholder="Enter current balance"
+              value={editFormData.balance}
+              onChange={(e) => setEditFormData({ ...editFormData, balance: parseFloat(e.target.value) || undefined })}
+            />
+            <Input
+              label="Credit Limit"
+              type="number"
+              placeholder="Enter credit limit"
+              value={editFormData.creditLimit}
+              onChange={(e) => setEditFormData({ ...editFormData, creditLimit: parseFloat(e.target.value) || undefined })}
+              required
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <Input
+              label="Minimum Payment"
+              type="number"
+              placeholder="Enter minimum payment"
+              value={editFormData.minimumPayment}
+              onChange={(e) => setEditFormData({ ...editFormData, minimumPayment: parseFloat(e.target.value) || undefined })}
+            />
+            <Input
+              label="Interest Rate (%)"
+              type="number"
+              placeholder="e.g., 18.99"
+              value={editFormData.interestRate}
+              onChange={(e) => setEditFormData({ ...editFormData, interestRate: parseFloat(e.target.value) || undefined })}
+            />
+          </div>
+
+          <Input
+            label="Due Date"
+            type="date"
+            value={editFormData.dueDate || ''}
+            onChange={(e) => setEditFormData({ ...editFormData, dueDate: e.target.value })}
+            required
+          />
+
+          <div className="field">
+            <label className="form-label">Card Color Theme</label>
+            <div className="grid grid-cols-3 gap-3">
+              {cardColors.map((color, index) => (
+                <button
+                  key={index}
+                  type="button"
+                  onClick={() => setEditFormData({ ...editFormData, color })}
+                  className={`p-4 rounded-xl border-2 transition-all hover:scale-105 bg-gradient-to-r ${color} ${
+                    editFormData.color === color ? 'border-white' : 'border-transparent'
+                  }`}
+                >
+                  <div className="text-white text-xs font-semibold">Sample Card</div>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <div className="flex gap-3 mt-8">
+          <Button
+            variant="ghost"
+            onClick={() => {
+              setEditingCard(null);
+              setEditFormData({});
+            }}
+            className="flex-1"
+          >
+            <X className="w-4 h-4" />
+            Cancel
+          </Button>
+          <Button
+            variant="primary"
+            onClick={saveEditedCard}
+            className="flex-1"
+          >
+            <Save className="w-4 h-4" />
+            Save Changes
+          </Button>
+        </div>
+      </Modal>
     </div>
   );
 }

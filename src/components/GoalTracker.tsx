@@ -21,8 +21,14 @@ import {
   AlertTriangle,
   TrendingUp,
   Zap,
-  Star
+  Star,
+  Save,
+  X
 } from 'lucide-react';
+import Button from '@/components/ui/Button';
+import Input from '@/components/ui/Input';
+import Select from '@/components/ui/Select';
+import Modal from '@/components/ui/Modal';
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import CountUp from 'react-countup';
 import confetti from 'canvas-confetti';
@@ -121,6 +127,7 @@ export default function GoalTracker() {
   const [showAddGoal, setShowAddGoal] = useState(false);
   const [showAddContribution, setShowAddContribution] = useState(false);
   const [editingGoal, setEditingGoal] = useState<string | null>(null);
+  const [editFormData, setEditFormData] = useState<Partial<Goal>>({});
   const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
   const [filterCategory, setFilterCategory] = useState<string>('all');
   const [sortBy, setSortBy] = useState<'priority' | 'progress' | 'deadline'>('priority');
@@ -128,12 +135,12 @@ export default function GoalTracker() {
   const [newGoal, setNewGoal] = useState<Partial<Goal>>({
     title: '',
     description: '',
-    targetAmount: 0,
-    currentAmount: 0,
+    targetAmount: undefined,
+    currentAmount: undefined,
     targetDate: '',
     category: 'other',
     priority: 'medium',
-    monthlyContribution: 0
+    monthlyContribution: undefined
   });
 
   const [newContribution, setNewContribution] = useState<Partial<Contribution>>({
@@ -236,6 +243,25 @@ export default function GoalTracker() {
   const deleteGoal = (id: string) => {
     setGoals(goals.filter(goal => goal.id !== id));
     setContributions(contributions.filter(contrib => contrib.goalId !== id));
+  };
+
+  const updateGoal = (id: string, updates: Partial<Goal>) => {
+    setGoals(goals.map(goal => 
+      goal.id === id ? { ...goal, ...updates } : goal
+    ));
+    setEditingGoal(null);
+    setEditFormData({});
+  };
+
+  const saveEditedGoal = () => {
+    if (editingGoal && editFormData.title && editFormData.targetAmount && editFormData.targetDate) {
+      const categoryInfo = goalCategories.find(cat => cat.value === editFormData.category);
+      updateGoal(editingGoal, {
+        ...editFormData,
+        color: categoryInfo?.color || editFormData.color,
+        icon: categoryInfo?.icon || editFormData.icon
+      });
+    }
   };
 
   const calculateDaysRemaining = (targetDate: string) => {
@@ -463,18 +489,21 @@ export default function GoalTracker() {
                       <p className="text-sm text-gray-400">{goal.description}</p>
                     </div>
                   </div>
-                  <div className="flex space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <div className="flex space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
                     <motion.button
-                      onClick={() => setEditingGoal(goal.id)}
-                      className="p-2 glass rounded-lg hover:bg-white/20"
+                      onClick={() => {
+                        setEditingGoal(goal.id);
+                        setEditFormData(goal);
+                      }}
+                      className="p-3 glass rounded-xl hover:bg-blue-500/20 border border-blue-500/30"
                       whileHover={{ scale: 1.1 }}
                       whileTap={{ scale: 0.9 }}
                     >
-                      <Edit3 className="w-4 h-4" />
+                      <Edit3 className="w-4 h-4 text-blue-400" />
                     </motion.button>
                     <motion.button
                       onClick={() => deleteGoal(goal.id)}
-                      className="p-2 glass rounded-lg hover:bg-red-500/20"
+                      className="p-3 glass rounded-xl hover:bg-red-500/20 border border-red-500/30"
                       whileHover={{ scale: 1.1 }}
                       whileTap={{ scale: 0.9 }}
                     >
@@ -842,6 +871,112 @@ export default function GoalTracker() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Edit Goal Modal */}
+      <Modal
+        isOpen={!!editingGoal}
+        onClose={() => {
+          setEditingGoal(null);
+          setEditFormData({});
+        }}
+        title="Edit Goal"
+        maxWidth="lg"
+      >
+        <div className="space-y-6">
+          <Input
+            label="Goal Title"
+            placeholder="e.g., Emergency Fund"
+            value={editFormData.title || ''}
+            onChange={(e) => setEditFormData({ ...editFormData, title: e.target.value })}
+            required
+          />
+          
+          <Input
+            label="Description"
+            placeholder="Brief description of your goal"
+            value={editFormData.description || ''}
+            onChange={(e) => setEditFormData({ ...editFormData, description: e.target.value })}
+          />
+
+          <div className="grid grid-cols-2 gap-4">
+            <Input
+              label="Target Amount"
+              type="number"
+              placeholder="Enter target amount"
+              value={editFormData.targetAmount}
+              onChange={(e) => setEditFormData({ ...editFormData, targetAmount: parseFloat(e.target.value) || undefined })}
+              required
+            />
+            <Input
+              label="Current Amount"
+              type="number"
+              placeholder="Enter current amount"
+              value={editFormData.currentAmount}
+              onChange={(e) => setEditFormData({ ...editFormData, currentAmount: parseFloat(e.target.value) || undefined })}
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <Input
+              label="Target Date"
+              type="date"
+              value={editFormData.targetDate || ''}
+              onChange={(e) => setEditFormData({ ...editFormData, targetDate: e.target.value })}
+              required
+            />
+            <Input
+              label="Monthly Contribution"
+              type="number"
+              placeholder="Enter monthly amount"
+              value={editFormData.monthlyContribution}
+              onChange={(e) => setEditFormData({ ...editFormData, monthlyContribution: parseFloat(e.target.value) || undefined })}
+            />
+          </div>
+
+          <Select
+            label="Category"
+            value={editFormData.category || ''}
+            onChange={(e) => setEditFormData({ ...editFormData, category: e.target.value as any })}
+            options={goalCategories.map(cat => ({ value: cat.value, label: cat.label }))}
+            placeholder="Select a category"
+            required
+          />
+
+          <Select
+            label="Priority"
+            value={editFormData.priority || ''}
+            onChange={(e) => setEditFormData({ ...editFormData, priority: e.target.value as any })}
+            options={[
+              { value: 'high', label: 'High Priority' },
+              { value: 'medium', label: 'Medium Priority' },
+              { value: 'low', label: 'Low Priority' }
+            ]}
+            required
+          />
+        </div>
+
+        <div className="flex gap-3 mt-8">
+          <Button
+            variant="ghost"
+            onClick={() => {
+              setEditingGoal(null);
+              setEditFormData({});
+            }}
+            className="flex-1"
+          >
+            <X className="w-4 h-4" />
+            Cancel
+          </Button>
+          <Button
+            variant="primary"
+            onClick={saveEditedGoal}
+            className="flex-1"
+          >
+            <Save className="w-4 h-4" />
+            Save Changes
+          </Button>
+        </div>
+      </Modal>
     </div>
   );
 }
