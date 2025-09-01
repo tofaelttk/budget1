@@ -150,7 +150,8 @@ export default function FinancialOverview() {
       </motion.div>
 
       {/* Overview Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="container">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
         {overviewData.map((card, index) => {
           const Icon = card.icon;
           return (
@@ -188,10 +189,12 @@ export default function FinancialOverview() {
             </motion.div>
           );
         })}
+        </div>
       </div>
 
       {/* Main Content Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="container">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
         {/* Financial Health Score */}
         <motion.div
           initial={{ opacity: 0, x: -50 }}
@@ -322,15 +325,17 @@ export default function FinancialOverview() {
             </div>
           </div>
         </motion.div>
+        </div>
       </div>
 
       {/* Recent Transactions */}
-      <motion.div
-        initial={{ opacity: 0, y: 50 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, delay: 0.6 }}
-        className="card hover-lift"
-      >
+      <div className="container">
+        <motion.div
+          initial={{ opacity: 0, y: 50 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.6 }}
+          className="card hover-lift"
+        >
         <h3 className="text-xl font-bold mb-4 gradient-text">Recent Transactions</h3>
         <div className="space-y-3">
           {recentTransactions.map((transaction, index) => (
@@ -365,7 +370,8 @@ export default function FinancialOverview() {
             </motion.div>
           ))}
         </div>
-      </motion.div>
+        </motion.div>
+      </div>
     </div>
   );
 }

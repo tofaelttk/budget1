@@ -24,6 +24,7 @@ import Input from '@/components/ui/Input';
 import Select from '@/components/ui/Select';
 import Modal from '@/components/ui/Modal';
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 interface CreditCardData {
   id: string;
@@ -90,6 +91,24 @@ export default function CreditCardManager() {
     extraPayment: 0
   });
   const [showCalculator, setShowCalculator] = useState(false);
+  const [calculatorData, setCalculatorData] = useState({
+    selectedCardId: '',
+    extraPayment: 0,
+    targetMonths: 0
+  });
+  const [calculatorResults, setCalculatorResults] = useState<{
+    monthsToPayoff: number;
+    totalInterest: number;
+    totalPayments: number;
+    monthlySavings: number;
+    paymentSchedule: Array<{
+      month: number;
+      payment: number;
+      principal: number;
+      interest: number;
+      balance: number;
+    }>;
+  } | null>(null);
 
   const [newCard, setNewCard] = useState<Partial<CreditCardData>>({
     name: '',
@@ -195,6 +214,55 @@ export default function CreditCardManager() {
     }
     
     return totalInterest;
+  };
+
+  const calculatePayoffDetails = () => {
+    const selectedCard = cards.find(card => card.id === calculatorData.selectedCardId);
+    if (!selectedCard) return;
+
+    const monthlyRate = selectedCard.interestRate / 100 / 12;
+    const totalPayment = selectedCard.minimumPayment + calculatorData.extraPayment;
+    
+    let currentBalance = selectedCard.balance;
+    let totalInterest = 0;
+    let months = 0;
+    const schedule = [];
+
+    // Calculate minimum payment scenario for comparison
+    const minPaymentInterest = calculateTotalInterest(selectedCard.balance, selectedCard.minimumPayment, selectedCard.interestRate);
+    const minPaymentMonths = calculatePayoffTime(selectedCard.balance, selectedCard.minimumPayment, selectedCard.interestRate);
+
+    while (currentBalance > 0 && months < 600) {
+      const interestPayment = currentBalance * monthlyRate;
+      let principalPayment = totalPayment - interestPayment;
+      
+      if (principalPayment <= 0) break;
+      if (principalPayment > currentBalance) principalPayment = currentBalance;
+      
+      currentBalance -= principalPayment;
+      totalInterest += interestPayment;
+      months++;
+
+      schedule.push({
+        month: months,
+        payment: interestPayment + principalPayment,
+        principal: principalPayment,
+        interest: interestPayment,
+        balance: Math.max(0, currentBalance)
+      });
+
+      if (currentBalance <= 0) break;
+    }
+
+    const results = {
+      monthsToPayoff: months,
+      totalInterest,
+      totalPayments: selectedCard.balance + totalInterest,
+      monthlySavings: calculatorData.extraPayment,
+      paymentSchedule: schedule
+    };
+
+    setCalculatorResults(results);
   };
 
   const totalBalance = cards.reduce((sum, card) => sum + card.balance, 0);
@@ -416,15 +484,13 @@ export default function CreditCardManager() {
       >
         <div className="flex justify-between items-center mb-6">
           <h3 className="text-xl font-bold gradient-text">Payment Strategy</h3>
-          <motion.button
+          <Button
+            variant="secondary"
             onClick={() => setShowCalculator(true)}
-            className="btn-primary flex items-center space-x-2"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
           >
             <Calculator className="w-4 h-4" />
-            <span>Payoff Calculator</span>
-          </motion.button>
+            Payoff Calculator
+          </Button>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -702,6 +768,238 @@ export default function CreditCardManager() {
             <Save className="w-4 h-4" />
             Save Changes
           </Button>
+        </div>
+      </Modal>
+
+      {/* Payoff Calculator Modal */}
+      <Modal
+        isOpen={showCalculator}
+        onClose={() => {
+          setShowCalculator(false);
+          setCalculatorResults(null);
+          setCalculatorData({ selectedCardId: '', extraPayment: 0, targetMonths: 0 });
+        }}
+        title="Credit Card Payoff Calculator"
+        maxWidth="xl"
+      >
+        <div className="space-y-8">
+          {/* Calculator Inputs */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <Select
+              label="Select Credit Card"
+              value={calculatorData.selectedCardId}
+              onChange={(e) => setCalculatorData({ ...calculatorData, selectedCardId: e.target.value })}
+              options={cards.map(card => ({ 
+                value: card.id, 
+                label: `${card.name} - $${card.balance.toLocaleString()}` 
+              }))}
+              placeholder="Choose a card"
+              required
+            />
+
+            <Input
+              label="Extra Monthly Payment"
+              type="number"
+              placeholder="Enter extra amount"
+              value={calculatorData.extraPayment}
+              onChange={(e) => setCalculatorData({ 
+                ...calculatorData, 
+                extraPayment: parseFloat(e.target.value) || 0 
+              })}
+            />
+
+            <div className="field">
+              <label className="form-label">Calculate</label>
+              <Button
+                variant="primary"
+                onClick={calculatePayoffDetails}
+                disabled={!calculatorData.selectedCardId}
+                className="w-full"
+              >
+                <Zap className="w-4 h-4" />
+                Calculate Payoff
+              </Button>
+            </div>
+          </div>
+
+          {/* Results */}
+          {calculatorResults && calculatorData.selectedCardId && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="space-y-6"
+            >
+              {/* Summary Cards */}
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div className="card text-center">
+                  <h4 className="text-sm text-gray-400 mb-2">Payoff Time</h4>
+                  <div className="text-2xl font-bold text-blue-400">
+                    {calculatorResults.monthsToPayoff} months
+                  </div>
+                  <div className="text-xs text-gray-400">
+                    {Math.floor(calculatorResults.monthsToPayoff / 12)}y {calculatorResults.monthsToPayoff % 12}m
+                  </div>
+                </div>
+
+                <div className="card text-center">
+                  <h4 className="text-sm text-gray-400 mb-2">Total Interest</h4>
+                  <div className="text-2xl font-bold text-red-400">
+                    ${calculatorResults.totalInterest.toLocaleString()}
+                  </div>
+                </div>
+
+                <div className="card text-center">
+                  <h4 className="text-sm text-gray-400 mb-2">Total Payments</h4>
+                  <div className="text-2xl font-bold text-purple-400">
+                    ${calculatorResults.totalPayments.toLocaleString()}
+                  </div>
+                </div>
+
+                <div className="card text-center">
+                  <h4 className="text-sm text-gray-400 mb-2">Monthly Payment</h4>
+                  <div className="text-2xl font-bold text-green-400">
+                    ${(cards.find(c => c.id === calculatorData.selectedCardId)?.minimumPayment || 0) + calculatorData.extraPayment}
+                  </div>
+                </div>
+              </div>
+
+              {/* Comparison with Minimum Payment */}
+              {(() => {
+                const selectedCard = cards.find(card => card.id === calculatorData.selectedCardId);
+                if (!selectedCard) return null;
+
+                const minPayoffTime = calculatePayoffTime(selectedCard.balance, selectedCard.minimumPayment, selectedCard.interestRate);
+                const minTotalInterest = calculateTotalInterest(selectedCard.balance, selectedCard.minimumPayment, selectedCard.interestRate);
+                const interestSaved = minTotalInterest - calculatorResults.totalInterest;
+                const timeSaved = (typeof minPayoffTime === 'string' ? 0 : parseInt(minPayoffTime)) - calculatorResults.monthsToPayoff;
+
+                return (
+                  <div className="card">
+                    <h4 className="text-lg font-bold gradient-text mb-4">Comparison: Extra Payment vs Minimum Only</h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="space-y-4">
+                        <h5 className="font-semibold text-green-400">With Extra Payment (${calculatorData.extraPayment}/month)</h5>
+                        <div className="space-y-2 text-sm">
+                          <div className="flex justify-between">
+                            <span className="text-gray-400">Payoff Time:</span>
+                            <span className="font-semibold">{calculatorResults.monthsToPayoff} months</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-gray-400">Total Interest:</span>
+                            <span className="font-semibold">${calculatorResults.totalInterest.toLocaleString()}</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-gray-400">Total Paid:</span>
+                            <span className="font-semibold">${calculatorResults.totalPayments.toLocaleString()}</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="space-y-4">
+                        <h5 className="font-semibold text-red-400">Minimum Payment Only</h5>
+                        <div className="space-y-2 text-sm">
+                          <div className="flex justify-between">
+                            <span className="text-gray-400">Payoff Time:</span>
+                            <span className="font-semibold">{minPayoffTime}</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-gray-400">Total Interest:</span>
+                            <span className="font-semibold">${minTotalInterest.toLocaleString()}</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-gray-400">Total Paid:</span>
+                            <span className="font-semibold">${(selectedCard.balance + minTotalInterest).toLocaleString()}</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {interestSaved > 0 && (
+                      <div className="mt-6 p-4 bg-gradient-to-r from-green-500/20 to-emerald-500/20 rounded-xl border border-green-500/30">
+                        <div className="text-center">
+                          <h6 className="font-bold text-green-400 text-lg mb-2">💰 Savings with Extra Payment</h6>
+                          <div className="grid grid-cols-2 gap-4 text-sm">
+                            <div>
+                              <span className="text-gray-400">Interest Saved:</span>
+                              <div className="text-xl font-bold text-green-400">${interestSaved.toLocaleString()}</div>
+                            </div>
+                            <div>
+                              <span className="text-gray-400">Time Saved:</span>
+                              <div className="text-xl font-bold text-green-400">{timeSaved} months</div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                );
+              })()}
+
+              {/* Payment Schedule Chart */}
+              {calculatorResults.paymentSchedule.length > 0 && (
+                <div className="card">
+                  <h4 className="text-lg font-bold gradient-text mb-4">Payment Schedule (First 24 Months)</h4>
+                  <div className="h-80">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart data={calculatorResults.paymentSchedule.slice(0, 24)}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+                        <XAxis dataKey="month" stroke="#9ca3af" />
+                        <YAxis stroke="#9ca3af" />
+                        <Tooltip 
+                          contentStyle={{
+                            backgroundColor: 'rgba(17, 24, 39, 0.8)',
+                            border: '1px solid #374151',
+                            borderRadius: '8px',
+                            color: '#fff'
+                          }}
+                        />
+                        <Bar dataKey="principal" stackId="a" fill="#10b981" name="Principal" />
+                        <Bar dataKey="interest" stackId="a" fill="#ef4444" name="Interest" />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
+              )}
+            </motion.div>
+          )}
+
+          {!calculatorResults && (
+            <div className="text-center py-8">
+              <Calculator className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+              <p className="text-gray-400">Select a credit card and enter extra payment amount to see detailed payoff calculations</p>
+            </div>
+          )}
+        </div>
+
+        <div className="flex gap-3 mt-8">
+          <Button
+            variant="ghost"
+            onClick={() => {
+              setShowCalculator(false);
+              setCalculatorResults(null);
+              setCalculatorData({ selectedCardId: '', extraPayment: 0, targetMonths: 0 });
+            }}
+            className="flex-1"
+          >
+            Close
+          </Button>
+          {calculatorResults && (
+            <Button
+              variant="primary"
+              onClick={() => {
+                // Apply the calculated extra payment to the strategy
+                setPaymentStrategy({ 
+                  type: 'custom', 
+                  extraPayment: calculatorData.extraPayment 
+                });
+                setShowCalculator(false);
+              }}
+              className="flex-1"
+            >
+              <CheckCircle className="w-4 h-4" />
+              Apply Strategy
+            </Button>
+          )}
         </div>
       </Modal>
     </div>
