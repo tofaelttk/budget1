@@ -2,6 +2,11 @@ import nodemailer from 'nodemailer';
 
 // Create email transporter
 const createTransporter = () => {
+  if (typeof window !== 'undefined') {
+    // Client-side, return mock
+    return null;
+  }
+  
   return nodemailer.createTransporter({
     service: 'gmail',
     auth: {
@@ -178,6 +183,10 @@ export const sendEmail = async (to: string, template: { subject: string; html: s
   try {
     const transporter = createTransporter();
     
+    if (!transporter) {
+      return { success: false, error: 'Email service not available in client environment' };
+    }
+    
     const mailOptions = {
       from: `"Personal Finance Dashboard" <${process.env.EMAIL_USER}>`,
       to,
@@ -188,7 +197,7 @@ export const sendEmail = async (to: string, template: { subject: string; html: s
     const result = await transporter.sendMail(mailOptions);
     console.log('Email sent successfully:', result.messageId);
     return { success: true, messageId: result.messageId };
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error sending email:', error);
     return { success: false, error: error.message };
   }
