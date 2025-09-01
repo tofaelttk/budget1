@@ -22,8 +22,14 @@ import {
   CheckCircle,
   Target,
   PieChart,
-  BarChart3
+  BarChart3,
+  Save,
+  X
 } from 'lucide-react';
+import Button from '@/components/ui/Button';
+import Input from '@/components/ui/Input';
+import Select from '@/components/ui/Select';
+import Modal from '@/components/ui/Modal';
 import { PieChart as RechartsPieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
 
 interface ExpenseCategory {
@@ -141,7 +147,7 @@ export default function ExpenseCategories() {
     name: '',
     icon: ShoppingCart,
     color: '#6366f1',
-    budget: 0,
+    budget: undefined,
     spent: 0,
     isFixed: false,
     description: ''
@@ -149,7 +155,7 @@ export default function ExpenseCategories() {
 
   const [newExpense, setNewExpense] = useState<Partial<Expense>>({
     categoryId: '',
-    amount: 0,
+    amount: undefined,
     description: '',
     date: new Date().toISOString().split('T')[0],
     isRecurring: false,
@@ -283,58 +289,52 @@ export default function ExpenseCategories() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="flex justify-between items-center"
-      >
-        <div>
-          <h2 className="text-3xl font-bold gradient-text mb-2">Expense Categories</h2>
-          <p className="text-gray-400">Track and manage your spending by category</p>
-        </div>
-        <div className="flex items-center space-x-3">
-          <div className="flex space-x-2">
-            <motion.button
-              onClick={() => setViewMode('grid')}
-              className={`p-2 rounded-xl transition-all ${
-                viewMode === 'grid' ? 'bg-purple-500 text-white' : 'glass text-gray-400 hover:text-white'
-              }`}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              <BarChart3 className="w-5 h-5" />
-            </motion.button>
-            <motion.button
-              onClick={() => setViewMode('chart')}
-              className={`p-2 rounded-xl transition-all ${
-                viewMode === 'chart' ? 'bg-purple-500 text-white' : 'glass text-gray-400 hover:text-white'
-              }`}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              <PieChart className="w-5 h-5" />
-            </motion.button>
+      <div className="container section">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 mb-8"
+        >
+          <div className="text-center lg:text-left">
+            <h2 className="text-4xl lg:text-5xl font-bold gradient-text mb-3">Expense Categories</h2>
+            <p className="text-gray-400 text-lg">Track and manage your spending by category with detailed analytics</p>
           </div>
-          <motion.button
-            onClick={() => setShowAddExpense(true)}
-            className="btn-primary flex items-center space-x-2"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-          >
-            <Plus className="w-4 h-4" />
-            <span>Add Expense</span>
-          </motion.button>
-          <motion.button
-            onClick={() => setShowAddCategory(true)}
-            className="btn-primary star-border flex items-center space-x-2"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-          >
-            <Plus className="w-5 h-5" />
-            <span>Add Category</span>
-          </motion.button>
-        </div>
-      </motion.div>
+          <div className="flex items-center gap-4 mx-auto lg:mx-0">
+            <div className="flex gap-2">
+              <Button
+                variant={viewMode === 'grid' ? 'primary' : 'ghost'}
+                size="sm"
+                onClick={() => setViewMode('grid')}
+              >
+                <BarChart3 className="w-4 h-4" />
+                Grid
+              </Button>
+              <Button
+                variant={viewMode === 'chart' ? 'primary' : 'ghost'}
+                size="sm"
+                onClick={() => setViewMode('chart')}
+              >
+                <PieChart className="w-4 h-4" />
+                Charts
+              </Button>
+            </div>
+            <Button
+              variant="secondary"
+              onClick={() => setShowAddExpense(true)}
+            >
+              <Plus className="w-4 h-4" />
+              Add Expense
+            </Button>
+            <Button
+              variant="primary"
+              onClick={() => setShowAddCategory(true)}
+            >
+              <Plus className="w-4 h-4" />
+              Add Category
+            </Button>
+          </div>
+        </motion.div>
+      </div>
 
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -434,29 +434,28 @@ export default function ExpenseCategories() {
                             <p className="text-xs text-gray-400">{category.description}</p>
                           </div>
                         </div>
+                        <div className="flex space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <motion.button
+                            onClick={() => {
+                              setEditingCategory(category.id);
+                              setEditFormData(category);
+                            }}
+                            className="p-3 glass rounded-xl hover:bg-blue-500/20 border border-blue-500/30"
+                            whileHover={{ scale: 1.1 }}
+                            whileTap={{ scale: 0.9 }}
+                          >
+                            <Edit3 className="w-4 h-4 text-blue-400" />
+                          </motion.button>
+                          <motion.button
+                            onClick={() => deleteCategory(category.id)}
+                            className="p-3 glass rounded-xl hover:bg-red-500/20 border border-red-500/30"
+                            whileHover={{ scale: 1.1 }}
+                            whileTap={{ scale: 0.9 }}
+                          >
+                            <Trash2 className="w-4 h-4 text-red-400" />
+                          </motion.button>
+                        </div>
                       </div>
-                      <div className="flex space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <motion.button
-                          onClick={() => {
-                            setEditingCategory(category.id);
-                            setEditFormData(category);
-                          }}
-                          className="p-3 glass rounded-xl hover:bg-blue-500/20 border border-blue-500/30"
-                          whileHover={{ scale: 1.1 }}
-                          whileTap={{ scale: 0.9 }}
-                        >
-                          <Edit3 className="w-4 h-4 text-blue-400" />
-                        </motion.button>
-                        <motion.button
-                          onClick={() => deleteCategory(category.id)}
-                          className="p-3 glass rounded-xl hover:bg-red-500/20 border border-red-500/30"
-                          whileHover={{ scale: 1.1 }}
-                          whileTap={{ scale: 0.9 }}
-                        >
-                          <Trash2 className="w-4 h-4 text-red-400" />
-                        </motion.button>
-                      </div>
-                    </div>
 
                       {/* Budget vs Spent */}
                       <div className="mb-4">
@@ -666,126 +665,110 @@ export default function ExpenseCategories() {
       </motion.div>
 
       {/* Add Category Modal */}
-      <AnimatePresence>
-        {showAddCategory && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+      <Modal
+        isOpen={showAddCategory}
+        onClose={() => setShowAddCategory(false)}
+        title="Add New Category"
+        maxWidth="lg"
+      >
+        <div className="space-y-6">
+          <Input
+            label="Category Name"
+            placeholder="e.g., Gym Membership"
+            value={newCategory.name}
+            onChange={(e) => setNewCategory({ ...newCategory, name: e.target.value })}
+            required
+          />
+          
+          <Input
+            label="Description"
+            placeholder="Brief description of this category"
+            value={newCategory.description}
+            onChange={(e) => setNewCategory({ ...newCategory, description: e.target.value })}
+          />
+          
+          <Input
+            label="Monthly Budget"
+            type="number"
+            placeholder="Enter budget amount"
+            value={newCategory.budget}
+            onChange={(e) => setNewCategory({ ...newCategory, budget: parseFloat(e.target.value) || undefined })}
+            required
+          />
+
+          <div className="field">
+            <label className="form-label">Icon</label>
+            <div className="grid grid-cols-4 gap-3">
+              {categoryIcons.map((iconOption, index) => {
+                const IconComponent = iconOption.icon;
+                return (
+                  <button
+                    key={index}
+                    type="button"
+                    onClick={() => setNewCategory({ ...newCategory, icon: iconOption.icon })}
+                    className={`p-4 rounded-xl border-2 transition-all hover:scale-105 ${
+                      newCategory.icon === iconOption.icon
+                        ? 'border-purple-500 bg-purple-500/20'
+                        : 'border-gray-600 glass hover:border-gray-500'
+                    }`}
+                  >
+                    <IconComponent className="w-6 h-6 mx-auto mb-2" />
+                    <span className="text-xs block">{iconOption.name}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="field">
+            <label className="form-label">Color Theme</label>
+            <div className="flex gap-3 flex-wrap">
+              {colors.map((color, index) => (
+                <button
+                  key={index}
+                  type="button"
+                  onClick={() => setNewCategory({ ...newCategory, color })}
+                  className={`w-10 h-10 rounded-full border-4 transition-all hover:scale-110 ${
+                    newCategory.color === color ? 'border-white shadow-lg' : 'border-transparent'
+                  }`}
+                  style={{ backgroundColor: color }}
+                />
+              ))}
+            </div>
+          </div>
+
+          <div className="flex items-center space-x-3">
+            <input
+              type="checkbox"
+              id="isFixed"
+              checked={newCategory.isFixed}
+              onChange={(e) => setNewCategory({ ...newCategory, isFixed: e.target.checked })}
+              className="w-5 h-5 text-purple-500 bg-transparent border-2 border-gray-600 rounded focus:ring-purple-500"
+            />
+            <label htmlFor="isFixed" className="text-sm font-semibold">
+              Fixed Expense (same amount each month)
+            </label>
+          </div>
+        </div>
+
+        <div className="flex gap-3 mt-8">
+          <Button
+            variant="ghost"
             onClick={() => setShowAddCategory(false)}
+            className="flex-1"
           >
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              className="card max-w-md w-full max-h-[90vh] overflow-y-auto"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <h3 className="text-xl font-bold mb-4 gradient-text">Add New Category</h3>
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-semibold mb-2">Category Name</label>
-                  <input
-                    type="text"
-                    value={newCategory.name}
-                    onChange={(e) => setNewCategory({ ...newCategory, name: e.target.value })}
-                    className="w-full p-3 glass rounded-xl border border-gray-600 focus:border-purple-500 focus:outline-none"
-                    placeholder="e.g., Gym Membership"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-semibold mb-2">Description</label>
-                  <input
-                    type="text"
-                    value={newCategory.description}
-                    onChange={(e) => setNewCategory({ ...newCategory, description: e.target.value })}
-                    className="w-full p-3 glass rounded-xl border border-gray-600 focus:border-purple-500 focus:outline-none"
-                    placeholder="Brief description of this category"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-semibold mb-2">Monthly Budget</label>
-                  <input
-                    type="number"
-                    value={newCategory.budget}
-                    onChange={(e) => setNewCategory({ ...newCategory, budget: parseFloat(e.target.value) || 0 })}
-                    className="w-full p-3 glass rounded-xl border border-gray-600 focus:border-purple-500 focus:outline-none"
-                    placeholder="500"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-semibold mb-2">Icon</label>
-                  <div className="grid grid-cols-4 gap-3">
-                    {categoryIcons.map((iconOption, index) => {
-                      const IconComponent = iconOption.icon;
-                      return (
-                        <button
-                          key={index}
-                          onClick={() => setNewCategory({ ...newCategory, icon: iconOption.icon })}
-                          className={`p-3 rounded-xl border-2 transition-all ${
-                            newCategory.icon === iconOption.icon
-                              ? 'border-purple-500 bg-purple-500/20'
-                              : 'border-gray-600 glass hover:border-gray-500'
-                          }`}
-                        >
-                          <IconComponent className="w-6 h-6 mx-auto" />
-                          <span className="text-xs mt-1 block">{iconOption.name}</span>
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-                <div>
-                  <label className="block text-sm font-semibold mb-2">Color</label>
-                  <div className="flex space-x-2">
-                    {colors.map((color, index) => (
-                      <button
-                        key={index}
-                        onClick={() => setNewCategory({ ...newCategory, color })}
-                        className={`w-8 h-8 rounded-full border-2 ${
-                          newCategory.color === color ? 'border-white' : 'border-transparent'
-                        }`}
-                        style={{ backgroundColor: color }}
-                      />
-                    ))}
-                  </div>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <input
-                    type="checkbox"
-                    id="isFixed"
-                    checked={newCategory.isFixed}
-                    onChange={(e) => setNewCategory({ ...newCategory, isFixed: e.target.checked })}
-                    className="w-4 h-4 text-purple-500 bg-transparent border-gray-600 rounded focus:ring-purple-500"
-                  />
-                  <label htmlFor="isFixed" className="text-sm font-semibold">
-                    Fixed Expense (same amount each month)
-                  </label>
-                </div>
-              </div>
-              <div className="flex space-x-3 mt-6">
-                <motion.button
-                  onClick={() => setShowAddCategory(false)}
-                  className="flex-1 p-3 glass rounded-xl hover:bg-white/10 transition-all"
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                >
-                  Cancel
-                </motion.button>
-                <motion.button
-                  onClick={addCategory}
-                  className="flex-1 btn-primary"
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                >
-                  Add Category
-                </motion.button>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+            Cancel
+          </Button>
+          <Button
+            variant="primary"
+            onClick={addCategory}
+            className="flex-1"
+          >
+            <Save className="w-4 h-4" />
+            Add Category
+          </Button>
+        </div>
+      </Modal>
 
       {/* Add Expense Modal */}
       <AnimatePresence>
@@ -902,134 +885,117 @@ export default function ExpenseCategories() {
       </AnimatePresence>
 
       {/* Edit Category Modal */}
-      <AnimatePresence>
-        {editingCategory && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+      <Modal
+        isOpen={!!editingCategory}
+        onClose={() => {
+          setEditingCategory(null);
+          setEditFormData({});
+        }}
+        title="Edit Category"
+        maxWidth="lg"
+      >
+        <div className="space-y-6">
+          <Input
+            label="Category Name"
+            placeholder="e.g., Gym Membership"
+            value={editFormData.name || ''}
+            onChange={(e) => setEditFormData({ ...editFormData, name: e.target.value })}
+            required
+          />
+          
+          <Input
+            label="Description"
+            placeholder="Brief description of this category"
+            value={editFormData.description || ''}
+            onChange={(e) => setEditFormData({ ...editFormData, description: e.target.value })}
+          />
+          
+          <Input
+            label="Monthly Budget"
+            type="number"
+            placeholder="Enter budget amount"
+            value={editFormData.budget}
+            onChange={(e) => setEditFormData({ ...editFormData, budget: parseFloat(e.target.value) || undefined })}
+            required
+          />
+
+          <div className="field">
+            <label className="form-label">Icon</label>
+            <div className="grid grid-cols-4 gap-3">
+              {categoryIcons.map((iconOption, index) => {
+                const IconComponent = iconOption.icon;
+                return (
+                  <button
+                    key={index}
+                    type="button"
+                    onClick={() => setEditFormData({ ...editFormData, icon: iconOption.icon })}
+                    className={`p-4 rounded-xl border-2 transition-all hover:scale-105 ${
+                      editFormData.icon === iconOption.icon
+                        ? 'border-purple-500 bg-purple-500/20'
+                        : 'border-gray-600 glass hover:border-gray-500'
+                    }`}
+                  >
+                    <IconComponent className="w-6 h-6 mx-auto mb-2" />
+                    <span className="text-xs block">{iconOption.name}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="field">
+            <label className="form-label">Color Theme</label>
+            <div className="flex gap-3 flex-wrap">
+              {colors.map((color, index) => (
+                <button
+                  key={index}
+                  type="button"
+                  onClick={() => setEditFormData({ ...editFormData, color })}
+                  className={`w-10 h-10 rounded-full border-4 transition-all hover:scale-110 ${
+                    editFormData.color === color ? 'border-white shadow-lg' : 'border-transparent'
+                  }`}
+                  style={{ backgroundColor: color }}
+                />
+              ))}
+            </div>
+          </div>
+
+          <div className="flex items-center space-x-3">
+            <input
+              type="checkbox"
+              id="editIsFixed"
+              checked={editFormData.isFixed || false}
+              onChange={(e) => setEditFormData({ ...editFormData, isFixed: e.target.checked })}
+              className="w-5 h-5 text-purple-500 bg-transparent border-2 border-gray-600 rounded focus:ring-purple-500"
+            />
+            <label htmlFor="editIsFixed" className="text-sm font-semibold">
+              Fixed Expense (same amount each month)
+            </label>
+          </div>
+        </div>
+
+        <div className="flex gap-3 mt-8">
+          <Button
+            variant="ghost"
             onClick={() => {
               setEditingCategory(null);
               setEditFormData({});
             }}
+            className="flex-1"
           >
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              className="card max-w-md w-full max-h-[90vh] overflow-y-auto"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <h3 className="text-xl font-bold mb-4 gradient-text">Edit Category</h3>
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-semibold mb-2">Category Name</label>
-                  <input
-                    type="text"
-                    value={editFormData.name || ''}
-                    onChange={(e) => setEditFormData({ ...editFormData, name: e.target.value })}
-                    className="w-full p-3 glass rounded-xl border border-gray-600 focus:border-purple-500 focus:outline-none"
-                    placeholder="e.g., Gym Membership"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-semibold mb-2">Description</label>
-                  <input
-                    type="text"
-                    value={editFormData.description || ''}
-                    onChange={(e) => setEditFormData({ ...editFormData, description: e.target.value })}
-                    className="w-full p-3 glass rounded-xl border border-gray-600 focus:border-purple-500 focus:outline-none"
-                    placeholder="Brief description of this category"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-semibold mb-2">Monthly Budget</label>
-                  <input
-                    type="number"
-                    value={editFormData.budget || 0}
-                    onChange={(e) => setEditFormData({ ...editFormData, budget: parseFloat(e.target.value) || 0 })}
-                    className="w-full p-3 glass rounded-xl border border-gray-600 focus:border-purple-500 focus:outline-none"
-                    placeholder="500"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-semibold mb-2">Icon</label>
-                  <div className="grid grid-cols-4 gap-3">
-                    {categoryIcons.map((iconOption, index) => {
-                      const IconComponent = iconOption.icon;
-                      return (
-                        <button
-                          key={index}
-                          type="button"
-                          onClick={() => setEditFormData({ ...editFormData, icon: iconOption.icon })}
-                          className={`p-3 rounded-xl border-2 transition-all ${
-                            editFormData.icon === iconOption.icon
-                              ? 'border-purple-500 bg-purple-500/20'
-                              : 'border-gray-600 glass hover:border-gray-500'
-                          }`}
-                        >
-                          <IconComponent className="w-6 h-6 mx-auto" />
-                          <span className="text-xs mt-1 block">{iconOption.name}</span>
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-                <div>
-                  <label className="block text-sm font-semibold mb-2">Color</label>
-                  <div className="flex space-x-2">
-                    {colors.map((color, index) => (
-                      <button
-                        key={index}
-                        type="button"
-                        onClick={() => setEditFormData({ ...editFormData, color })}
-                        className={`w-8 h-8 rounded-full border-2 ${
-                          editFormData.color === color ? 'border-white' : 'border-transparent'
-                        }`}
-                        style={{ backgroundColor: color }}
-                      />
-                    ))}
-                  </div>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <input
-                    type="checkbox"
-                    id="editIsFixed"
-                    checked={editFormData.isFixed || false}
-                    onChange={(e) => setEditFormData({ ...editFormData, isFixed: e.target.checked })}
-                    className="w-4 h-4 text-purple-500 bg-transparent border-gray-600 rounded focus:ring-purple-500"
-                  />
-                  <label htmlFor="editIsFixed" className="text-sm font-semibold">
-                    Fixed Expense (same amount each month)
-                  </label>
-                </div>
-              </div>
-              <div className="flex space-x-3 mt-6">
-                <motion.button
-                  onClick={() => {
-                    setEditingCategory(null);
-                    setEditFormData({});
-                  }}
-                  className="flex-1 p-3 glass rounded-xl hover:bg-white/10 transition-all"
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                >
-                  Cancel
-                </motion.button>
-                <motion.button
-                  onClick={saveEditedCategory}
-                  className="flex-1 btn-primary"
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                >
-                  Save Changes
-                </motion.button>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+            <X className="w-4 h-4" />
+            Cancel
+          </Button>
+          <Button
+            variant="primary"
+            onClick={saveEditedCategory}
+            className="flex-1"
+          >
+            <Save className="w-4 h-4" />
+            Save Changes
+          </Button>
+        </div>
+      </Modal>
     </div>
   );
 }

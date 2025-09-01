@@ -40,7 +40,14 @@ import {
   PolarAngleAxis,
   PolarRadiusAxis,
   Radar,
-  ComposedChart
+  ComposedChart,
+  ScatterChart,
+  Scatter,
+  FunnelChart,
+  Funnel,
+  LabelList,
+  TreemapChart,
+  Treemap
 } from 'recharts';
 import CountUp from 'react-countup';
 
@@ -184,7 +191,9 @@ export default function AnalyticsDashboard() {
     { id: 'income', label: 'Income Analysis', icon: TrendingUp },
     { id: 'expenses', label: 'Expense Breakdown', icon: PieChart },
     { id: 'trends', label: 'Trends & Patterns', icon: Activity },
-    { id: 'health', label: 'Financial Health', icon: Target }
+    { id: 'health', label: 'Financial Health', icon: Target },
+    { id: 'advanced', label: 'Advanced Charts', icon: Activity },
+    { id: 'comparison', label: 'Comparisons', icon: BarChart3 }
   ];
 
   return (
@@ -674,6 +683,144 @@ export default function AnalyticsDashboard() {
                     </div>
                   </motion.div>
                 ))}
+              </div>
+            </div>
+          )}
+
+          {selectedChart === 'advanced' && (
+            <div className="space-y-6">
+              {/* Scatter Plot - Spending vs Income */}
+              <div className="card hover-lift">
+                <h3 className="text-xl font-bold gradient-text mb-4">Spending vs Income Correlation</h3>
+                <div className="h-80">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <ScatterChart data={monthlyData.map(d => ({ ...d, ratio: (d.expenses / d.income) * 100 }))}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+                      <XAxis dataKey="income" stroke="#9ca3af" />
+                      <YAxis dataKey="expenses" stroke="#9ca3af" />
+                      <Tooltip 
+                        contentStyle={{
+                          backgroundColor: 'rgba(17, 24, 39, 0.8)',
+                          border: '1px solid #374151',
+                          borderRadius: '8px',
+                          color: '#fff'
+                        }}
+                      />
+                      <Scatter dataKey="expenses" fill="#6366f1" />
+                    </ScatterChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+
+              {/* Funnel Chart - Financial Goals Progress */}
+              <div className="card hover-lift">
+                <h3 className="text-xl font-bold gradient-text mb-4">Financial Goals Funnel</h3>
+                <div className="h-80">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <FunnelChart>
+                      <Tooltip 
+                        contentStyle={{
+                          backgroundColor: 'rgba(17, 24, 39, 0.8)',
+                          border: '1px solid #374151',
+                          borderRadius: '8px',
+                          color: '#fff'
+                        }}
+                      />
+                      <Funnel
+                        dataKey="value"
+                        data={[
+                          { name: 'Total Goals', value: 100, fill: '#6366f1' },
+                          { name: 'In Progress', value: 75, fill: '#8b5cf6' },
+                          { name: 'On Track', value: 60, fill: '#10b981' },
+                          { name: 'Completed', value: 25, fill: '#f59e0b' }
+                        ]}
+                      >
+                        <LabelList position="center" fill="#fff" />
+                      </Funnel>
+                    </FunnelChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {selectedChart === 'comparison' && (
+            <div className="space-y-6">
+              {/* Year over Year Comparison */}
+              <div className="card hover-lift">
+                <h3 className="text-xl font-bold gradient-text mb-4">Year-over-Year Comparison</h3>
+                <div className="h-80">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <ComposedChart data={monthlyData}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+                      <XAxis dataKey="month" stroke="#9ca3af" />
+                      <YAxis stroke="#9ca3af" />
+                      <Tooltip 
+                        contentStyle={{
+                          backgroundColor: 'rgba(17, 24, 39, 0.8)',
+                          border: '1px solid #374151',
+                          borderRadius: '8px',
+                          color: '#fff'
+                        }}
+                      />
+                      <Bar dataKey="income" fill="#10b981" name="This Year Income" />
+                      <Bar dataKey="expenses" fill="#ef4444" name="This Year Expenses" />
+                      <Line type="monotone" dataKey="savings" stroke="#6366f1" strokeWidth={3} name="Savings Trend" />
+                    </ComposedChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+
+              {/* Budget vs Actual Spending */}
+              <div className="card hover-lift">
+                <h3 className="text-xl font-bold gradient-text mb-4">Budget vs Actual Performance</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-4">
+                    {expenseByCategory.slice(0, 4).map((category, index) => (
+                      <div key={category.name} className="p-4 glass rounded-xl">
+                        <div className="flex justify-between items-center mb-2">
+                          <span className="font-semibold">{category.name}</span>
+                          <span className="text-sm text-gray-400">{category.percentage}%</span>
+                        </div>
+                        <div className="progress-bar">
+                          <motion.div
+                            className="progress-fill"
+                            style={{ backgroundColor: category.color }}
+                            initial={{ width: 0 }}
+                            animate={{ width: `${category.percentage}%` }}
+                            transition={{ duration: 1.5, delay: index * 0.2 }}
+                          />
+                        </div>
+                        <div className="flex justify-between text-sm mt-2">
+                          <span className="text-gray-400">Spent: ${category.value}</span>
+                          <span className="text-green-400">Under Budget</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="h-64">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart data={expenseByCategory.slice(0, 6)}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+                        <XAxis dataKey="name" stroke="#9ca3af" />
+                        <YAxis stroke="#9ca3af" />
+                        <Tooltip 
+                          contentStyle={{
+                            backgroundColor: 'rgba(17, 24, 39, 0.8)',
+                            border: '1px solid #374151',
+                            borderRadius: '8px',
+                            color: '#fff'
+                          }}
+                        />
+                        <Bar dataKey="value" radius={[4, 4, 0, 0]}>
+                          {expenseByCategory.map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={entry.color} />
+                          ))}
+                        </Bar>
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
               </div>
             </div>
           )}
