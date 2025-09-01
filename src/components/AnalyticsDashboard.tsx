@@ -42,12 +42,7 @@ import {
   Radar,
   ComposedChart,
   ScatterChart,
-  Scatter,
-  FunnelChart,
-  Funnel,
-  LabelList,
-  TreemapChart,
-  Treemap
+  Scatter
 } from 'recharts';
 import CountUp from 'react-countup';
 
@@ -712,12 +707,20 @@ export default function AnalyticsDashboard() {
                 </div>
               </div>
 
-              {/* Funnel Chart - Financial Goals Progress */}
+              {/* Goal Progress Chart */}
               <div className="card hover-lift">
-                <h3 className="text-xl font-bold gradient-text mb-4">Financial Goals Funnel</h3>
+                <h3 className="text-xl font-bold gradient-text mb-4">Financial Goals Progress</h3>
                 <div className="h-80">
                   <ResponsiveContainer width="100%" height="100%">
-                    <FunnelChart>
+                    <BarChart data={[
+                      { name: 'Total Goals', value: 100, fill: '#6366f1' },
+                      { name: 'In Progress', value: 75, fill: '#8b5cf6' },
+                      { name: 'On Track', value: 60, fill: '#10b981' },
+                      { name: 'Completed', value: 25, fill: '#f59e0b' }
+                    ]}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+                      <XAxis dataKey="name" stroke="#9ca3af" />
+                      <YAxis stroke="#9ca3af" />
                       <Tooltip 
                         contentStyle={{
                           backgroundColor: 'rgba(17, 24, 39, 0.8)',
@@ -726,18 +729,17 @@ export default function AnalyticsDashboard() {
                           color: '#fff'
                         }}
                       />
-                      <Funnel
-                        dataKey="value"
-                        data={[
-                          { name: 'Total Goals', value: 100, fill: '#6366f1' },
-                          { name: 'In Progress', value: 75, fill: '#8b5cf6' },
-                          { name: 'On Track', value: 60, fill: '#10b981' },
-                          { name: 'Completed', value: 25, fill: '#f59e0b' }
-                        ]}
-                      >
-                        <LabelList position="center" fill="#fff" />
-                      </Funnel>
-                    </FunnelChart>
+                      <Bar dataKey="value" radius={[4, 4, 0, 0]}>
+                        {[
+                          { fill: '#6366f1' },
+                          { fill: '#8b5cf6' },
+                          { fill: '#10b981' },
+                          { fill: '#f59e0b' }
+                        ].map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={entry.fill} />
+                        ))}
+                      </Bar>
+                    </BarChart>
                   </ResponsiveContainer>
                 </div>
               </div>
