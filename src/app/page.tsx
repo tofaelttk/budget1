@@ -34,6 +34,8 @@ import Reports from '@/components/Reports';
 import BillTracker from '@/components/BillTracker';
 import AIInsights from '@/components/AIInsights';
 import InvestmentTracker from '@/components/InvestmentTracker';
+import SmartPortfolioOptimizer from '@/components/SmartPortfolioOptimizer';
+import PredictiveCashFlowManager from '@/components/PredictiveCashFlowManager';
 
 interface SplashEffect {
   id: number;
@@ -79,6 +81,8 @@ export default function PersonalFinanceDashboard() {
     { id: 'expenses', label: 'Expenses', icon: DollarSign, color: 'from-orange-500 to-red-600' },
     { id: 'goals', label: 'Goals', icon: Target, color: 'from-indigo-500 to-blue-600' },
     { id: 'investments', label: 'Investments', icon: LineChart, color: 'from-cyan-500 to-blue-600' },
+    { id: 'portfolio', label: 'Smart Portfolio', icon: Shield, color: 'from-emerald-500 to-green-600' },
+    { id: 'cashflow', label: 'Cash Flow AI', icon: TrendingDown, color: 'from-blue-500 to-indigo-600' },
     { id: 'budget', label: 'Budget Planner', icon: Wallet, color: 'from-emerald-500 to-teal-600' },
     { id: 'bills', label: 'Bill Tracker', icon: Calendar, color: 'from-rose-500 to-pink-600' },
     { id: 'calculator', label: 'Debt Calculator', icon: Calculator, color: 'from-amber-500 to-orange-600' },
@@ -184,8 +188,8 @@ export default function PersonalFinanceDashboard() {
         transition={{ duration: 0.8, delay: 0.2 }}
         className="px-8 mb-12"
       >
-        <div className="glass p-6 rounded-3xl shadow-xl border border-white/10">
-          <div className="flex flex-wrap gap-4 justify-center lg:justify-start">
+        <div className="glass p-8 rounded-3xl shadow-xl border border-white/10">
+          <div className="flex flex-wrap gap-3 justify-center lg:justify-start">
             {tabs.map((tab, index) => {
               const Icon = tab.icon;
               return (
@@ -195,7 +199,7 @@ export default function PersonalFinanceDashboard() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.5, delay: index * 0.1 }}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`flex items-center gap-3 px-5 py-3 rounded-2xl font-semibold transition-all duration-300 whitespace-nowrap relative min-w-[130px] justify-center ${
+                  className={`flex items-center gap-3 px-6 py-4 rounded-2xl font-semibold transition-all duration-300 whitespace-nowrap relative min-w-[140px] justify-center ${
                     activeTab === tab.id
                       ? `bg-gradient-to-r ${tab.color} text-white shadow-2xl star-border`
                       : 'text-gray-400 hover:text-white hover:bg-white/10 hover:shadow-lg border border-white/5'
@@ -240,6 +244,8 @@ export default function PersonalFinanceDashboard() {
             {activeTab === 'expenses' && <ExpenseCategories />}
             {activeTab === 'goals' && <GoalTracker />}
             {activeTab === 'investments' && <InvestmentTracker />}
+            {activeTab === 'portfolio' && <SmartPortfolioOptimizer />}
+            {activeTab === 'cashflow' && <PredictiveCashFlowManager />}
             {activeTab === 'budget' && <BudgetPlanner />}
             {activeTab === 'bills' && <BillTracker />}
             {activeTab === 'calculator' && <DebtCalculator />}

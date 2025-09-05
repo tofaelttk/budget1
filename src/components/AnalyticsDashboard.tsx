@@ -1,19 +1,15 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   BarChart3, 
   PieChart, 
   TrendingUp, 
-  TrendingDown, 
-  Calendar, 
-  Filter,
   Download,
   RefreshCw,
   Eye,
   Target,
-  DollarSign,
   CreditCard,
   Wallet,
   Activity,
@@ -61,11 +57,6 @@ interface CategoryData {
   percentage: number;
 }
 
-interface TrendData {
-  period: string;
-  value: number;
-  change: number;
-}
 
 export default function AnalyticsDashboard() {
   const [selectedPeriod, setSelectedPeriod] = useState('6months');
@@ -97,6 +88,32 @@ export default function AnalyticsDashboard() {
     { name: 'Salary', value: 4200, color: '#10b981', percentage: 80.8 },
     { name: 'Freelance', value: 800, color: '#f59e0b', percentage: 15.4 },
     { name: 'Investments', value: 200, color: '#6366f1', percentage: 3.8 }
+  ];
+
+  // Enhanced analytics data
+  const cashFlowTrends = [
+    { month: 'Aug', cashIn: 5200, cashOut: 4100, netFlow: 1100, runningBalance: 15200 },
+    { month: 'Sep', cashIn: 5400, cashOut: 4250, netFlow: 1150, runningBalance: 16350 },
+    { month: 'Oct', cashIn: 5100, cashOut: 4300, netFlow: 800, runningBalance: 17150 },
+    { month: 'Nov', cashIn: 5600, cashOut: 4200, netFlow: 1400, runningBalance: 18550 },
+    { month: 'Dec', cashIn: 5800, cashOut: 4500, netFlow: 1300, runningBalance: 19850 },
+    { month: 'Jan', cashIn: 5200, cashOut: 4180, netFlow: 1020, runningBalance: 20870 }
+  ];
+
+  const savingsGoalProgress = [
+    { goal: 'Emergency Fund', current: 6500, target: 10000, progress: 65, color: '#10b981' },
+    { goal: 'Vacation', current: 2800, target: 5000, progress: 56, color: '#f59e0b' },
+    { goal: 'Car Down Payment', current: 8200, target: 15000, progress: 55, color: '#6366f1' },
+    { goal: 'Home Fund', current: 12000, target: 50000, progress: 24, color: '#8b5cf6' }
+  ];
+
+  const expenseVsBudget = [
+    { category: 'Housing', actual: 1200, budget: 1300, variance: -100, status: 'under' },
+    { category: 'Food', actual: 800, budget: 700, variance: 100, status: 'over' },
+    { category: 'Transportation', actual: 450, budget: 500, variance: -50, status: 'under' },
+    { category: 'Entertainment', actual: 350, budget: 300, variance: 50, status: 'over' },
+    { category: 'Healthcare', actual: 280, budget: 400, variance: -120, status: 'under' },
+    { category: 'Shopping', actual: 320, budget: 250, variance: 70, status: 'over' }
   ];
 
   const creditUtilization = [
@@ -186,6 +203,8 @@ export default function AnalyticsDashboard() {
     { id: 'income', label: 'Income Analysis', icon: TrendingUp },
     { id: 'expenses', label: 'Expense Breakdown', icon: PieChart },
     { id: 'trends', label: 'Trends & Patterns', icon: Activity },
+    { id: 'cashflow', label: 'Cash Flow', icon: TrendingUp },
+    { id: 'budget', label: 'Budget Analysis', icon: Target },
     { id: 'health', label: 'Financial Health', icon: Target },
     { id: 'advanced', label: 'Advanced Charts', icon: Activity },
     { id: 'comparison', label: 'Comparisons', icon: BarChart3 }
@@ -255,8 +274,7 @@ export default function AnalyticsDashboard() {
             >
               <div className="flex items-center justify-between mb-4">
                 <div 
-                  className="p-3 rounded-xl"
-                  style={{ backgroundColor: `${metric.color}20`, color: metric.color }}
+                  className="p-3 rounded-xl bg-blue-500/20 text-blue-400"
                 >
                   <Icon className="w-6 h-6" />
                 </div>
@@ -658,14 +676,13 @@ export default function AnalyticsDashboard() {
                   >
                     <div className="flex items-center justify-between mb-3">
                       <h4 className="font-semibold text-sm">{metric.metric}</h4>
-                      <span className="text-lg font-bold" style={{ color: metric.color }}>
+                      <span className="text-lg font-bold text-purple-400">
                         {metric.value}%
                       </span>
                     </div>
                     <div className="progress-bar">
                       <motion.div
-                        className="progress-fill"
-                        style={{ backgroundColor: metric.color }}
+                        className="progress-fill bg-purple-500"
                         initial={{ width: 0 }}
                         animate={{ width: `${metric.value}%` }}
                         transition={{ duration: 1.5, delay: index * 0.1 }}
@@ -678,6 +695,150 @@ export default function AnalyticsDashboard() {
                     </div>
                   </motion.div>
                 ))}
+              </div>
+            </div>
+          )}
+
+          {selectedChart === 'cashflow' && (
+            <div className="space-y-6">
+              {/* Enhanced Cash Flow Analysis */}
+              <div className="card hover-lift">
+                <h3 className="text-xl font-bold gradient-text mb-4">Advanced Cash Flow Analysis</h3>
+                <div className="h-80">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <ComposedChart data={cashFlowTrends}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+                      <XAxis dataKey="month" stroke="#9ca3af" />
+                      <YAxis stroke="#9ca3af" />
+                      <Tooltip 
+                        contentStyle={{
+                          backgroundColor: 'rgba(17, 24, 39, 0.8)',
+                          border: '1px solid #374151',
+                          borderRadius: '8px',
+                          color: '#fff'
+                        }}
+                      />
+                      <Area
+                        type="monotone"
+                        dataKey="cashIn"
+                        stackId="1"
+                        stroke="#10b981"
+                        fill="#10b981"
+                        fillOpacity={0.6}
+                        name="Cash In"
+                      />
+                      <Area
+                        type="monotone"
+                        dataKey="cashOut"
+                        stackId="2"
+                        stroke="#ef4444"
+                        fill="#ef4444"
+                        fillOpacity={0.6}
+                        name="Cash Out"
+                      />
+                      <Line
+                        type="monotone"
+                        dataKey="runningBalance"
+                        stroke="#6366f1"
+                        strokeWidth={3}
+                        strokeDasharray="5 5"
+                        name="Running Balance"
+                      />
+                    </ComposedChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+
+              {/* Savings Goals Progress */}
+              <div className="card hover-lift">
+                <h3 className="text-xl font-bold gradient-text mb-4">Savings Goals Progress</h3>
+                <div className="space-y-4">
+                  {savingsGoalProgress.map((goal, index) => (
+                    <motion.div
+                      key={goal.goal}
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: index * 0.1 }}
+                      className="p-4 glass rounded-xl"
+                    >
+                      <div className="flex items-center justify-between mb-3">
+                        <div>
+                          <h4 className="font-semibold">{goal.goal}</h4>
+                          <p className="text-sm text-gray-400">
+                            ${goal.current.toLocaleString()} of ${goal.target.toLocaleString()}
+                          </p>
+                        </div>
+                        <div className="text-right">
+                          <div className="text-lg font-bold text-green-400">
+                            {goal.progress}%
+                          </div>
+                          <div className="text-sm text-gray-400">Complete</div>
+                        </div>
+                      </div>
+                      <div className="progress-bar">
+                        <motion.div
+                          className="progress-fill bg-green-500"
+                          initial={{ width: 0 }}
+                          animate={{ width: `${goal.progress}%` }}
+                          transition={{ duration: 1.5, delay: index * 0.2 }}
+                        />
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {selectedChart === 'budget' && (
+            <div className="space-y-6">
+              {/* Budget vs Actual Analysis */}
+              <div className="card hover-lift">
+                <h3 className="text-xl font-bold gradient-text mb-4">Budget Performance Analysis</h3>
+                <div className="h-80 mb-6">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={expenseVsBudget}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+                      <XAxis dataKey="category" stroke="#9ca3af" />
+                      <YAxis stroke="#9ca3af" />
+                      <Tooltip 
+                        contentStyle={{
+                          backgroundColor: 'rgba(17, 24, 39, 0.8)',
+                          border: '1px solid #374151',
+                          borderRadius: '8px',
+                          color: '#fff'
+                        }}
+                      />
+                      <Bar dataKey="budget" fill="#6366f1" name="Budget" opacity={0.7} />
+                      <Bar dataKey="actual" fill="#10b981" name="Actual" />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {expenseVsBudget.map((item) => (
+                    <div key={item.category} className="p-4 glass rounded-xl">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="font-semibold">{item.category}</span>
+                        <span className={`text-sm font-bold ${
+                          item.status === 'under' ? 'text-green-400' : 'text-red-400'
+                        }`}>
+                          {item.status === 'under' ? '↓' : '↑'} ${Math.abs(item.variance)}
+                        </span>
+                      </div>
+                      <div className="text-sm text-gray-400 mb-2">
+                        Budget: ${item.budget} | Actual: ${item.actual}
+                      </div>
+                      <div className={`text-xs px-2 py-1 rounded-full inline-block ${
+                        item.status === 'under' 
+                          ? 'bg-green-500/20 text-green-400' 
+                          : 'bg-red-500/20 text-red-400'
+                      }`}>
+                        {item.status === 'under' ? 'Under Budget' : 'Over Budget'}
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
           )}

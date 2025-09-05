@@ -22,7 +22,7 @@ interface OverviewCard {
   title: string;
   value: number;
   change: number;
-  icon: React.ComponentType<any>;
+  icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
   color: string;
   prefix?: string;
   suffix?: string;
@@ -39,10 +39,8 @@ interface Goal {
 
 export default function FinancialOverview() {
   const [selectedPeriod, setSelectedPeriod] = useState('month');
-  const [isVisible, setIsVisible] = useState(false);
-
   useEffect(() => {
-    setIsVisible(true);
+    // Component mounted
   }, []);
 
   // Mock data - in real app, this would come from your database
@@ -124,18 +122,18 @@ export default function FinancialOverview() {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 mb-8"
+        className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-8 mb-10"
       >
         <div className="text-center lg:text-left">
           <h2 className="text-4xl lg:text-5xl font-bold gradient-text mb-3">Financial Overview</h2>
           <p className="text-gray-400 text-lg">Your complete financial snapshot with real-time insights</p>
         </div>
-        <div className="flex space-x-3 mx-auto lg:mx-0">
+        <div className="flex space-x-4 mx-auto lg:mx-0">
           {['week', 'month', 'year'].map((period) => (
             <motion.button
               key={period}
               onClick={() => setSelectedPeriod(period)}
-              className={`px-6 py-3 rounded-2xl font-semibold transition-all text-lg ${
+              className={`px-8 py-4 rounded-2xl font-semibold transition-all text-lg min-w-[100px] ${
                 selectedPeriod === period
                   ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white star-border shadow-2xl'
                   : 'glass text-gray-400 hover:text-white hover:shadow-lg border border-white/10'
@@ -151,7 +149,7 @@ export default function FinancialOverview() {
 
       {/* Overview Cards */}
       <div className="container">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-10">
         {overviewData.map((card, index) => {
           const Icon = card.icon;
           return (
@@ -162,7 +160,7 @@ export default function FinancialOverview() {
               transition={{ duration: 0.6, delay: index * 0.1 }}
               className="card hover-lift group"
             >
-              <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center justify-between mb-6">
                 <div className={`p-3 rounded-xl bg-gradient-to-r ${card.color}`}>
                   <Icon className="w-6 h-6 text-white" />
                 </div>
@@ -173,7 +171,7 @@ export default function FinancialOverview() {
                   {Math.abs(card.change)}%
                 </div>
               </div>
-              <h3 className="text-gray-400 text-sm mb-2 group-hover:text-gray-300 transition-colors">
+              <h3 className="text-gray-400 text-sm mb-3 group-hover:text-gray-300 transition-colors">
                 {card.title}
               </h3>
               <div className="text-2xl font-bold">
