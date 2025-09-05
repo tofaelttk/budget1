@@ -74,39 +74,6 @@ A comprehensive, modern personal finance management application built with Next.
 - MongoDB Atlas account (or local MongoDB)
 - Gmail account for email features
 
-### Installation
-
-1. **Clone the repository**
-```bash
-git clone https://github.com/yourusername/personal-finance-dashboard.git
-cd personal-finance-dashboard
-```
-
-2. **Install dependencies**
-```bash
-npm install
-```
-
-3. **Environment Setup**
-Create a `.env.local` file in the root directory:
-```env
-MONGO_URI=mongodb+srv://username:password@cluster.mongodb.net/BudgetApp?retryWrites=true&w=majority
-JWT_SECRET=your-super-secret-jwt-key
-EMAIL_USER=your-gmail@gmail.com
-EMAIL_PASS=your-app-specific-password
-NEXTAUTH_URL=http://localhost:3000
-NEXTAUTH_SECRET=your-nextauth-secret
-CRON_SECRET=your-cron-secret-key
-```
-
-4. **Run the development server**
-```bash
-npm run dev
-```
-
-5. **Open your browser**
-Navigate to [http://localhost:3000](http://localhost:3000)
-
 ## 📱 Features Overview
 
 ### Credit Card Management
@@ -143,43 +110,6 @@ Navigate to [http://localhost:3000](http://localhost:3000)
 - Trend analysis and pattern recognition
 - Credit utilization monitoring
 - Net worth progression tracking
-
-## 🎨 Design System
-
-### Color Palette
-```css
-Primary: #6366f1 (Indigo)
-Secondary: #10b981 (Emerald)
-Accent: #f59e0b (Amber)
-Danger: #ef4444 (Red)
-Success: #22c55e (Green)
-Background: #0f0f23 (Dark Navy)
-```
-
-### Typography
-- **Font Family**: Geist Sans (Primary), Geist Mono (Code)
-- **Headings**: Bold, gradient text effects
-- **Body**: Clean, readable with proper line heights
-- **Interactive**: Hover states and smooth transitions
-
-### Animation Principles
-- **Entrance**: Fade in with slide up (0.8s ease-out)
-- **Hover**: Scale and lift effects (0.3s ease)
-- **Loading**: Smooth spinners and skeleton states
-- **Success**: Confetti and celebration animations
-- **Micro-interactions**: Button presses, form interactions
-
-## 📊 Database Schema
-
-### Collections Overview
-- **Users**: User profiles and preferences
-- **CreditCards**: Credit card information and history
-- **IncomeSources**: Income source definitions
-- **IncomeRecords**: Individual income entries
-- **ExpenseCategories**: Expense category definitions
-- **Expenses**: Individual expense transactions
-- **Goals**: Financial goal definitions
-- **Contributions**: Goal contribution history
 
 ### Sample Document Structures
 
