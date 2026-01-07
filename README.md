@@ -1,4 +1,4 @@
-# 🚀 Personal Finance Dashboard | Budget.SigmaPointPi.com
+# Personal Finance Dashboard | Budget.SigmaPointPi.com
 
 A comprehensive, modern personal finance management application built with Next.js 15, featuring AI-powered insights, beautiful animations, and complete financial tracking capabilities.
 
@@ -7,43 +7,43 @@ A comprehensive, modern personal finance management application built with Next.
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue)
 ![MongoDB](https://img.shields.io/badge/MongoDB-6.19.0-green)
 
-## ✨ Features
+## Features
 
-### 🏦 Core Financial Management
+### Core Financial Management
 - **Credit Card Management**: Smart debt tracking with payoff strategies (avalanche/snowball)
 - **Income Tracking**: Multiple income sources with frequency management
 - **Expense Categories**: Fully customizable, editable, and deletable categories
 - **Goal Setting**: SMART financial goals with progress tracking and celebrations
 - **Budget Management**: Dynamic budget allocation with overspending alerts
 
-### 📊 Advanced Analytics
+### Advanced Analytics
 - **Interactive Charts**: Line charts, pie charts, bar charts, and radar charts
 - **Financial Health Score**: AI-powered assessment of financial wellness
 - **Trend Analysis**: Historical data visualization with predictive insights
 - **Credit Utilization**: Real-time monitoring with optimization suggestions
 - **Net Worth Tracking**: Comprehensive asset and liability management
 
-### 🤖 Smart Features
+### Smart Features
 - **AI-Powered Suggestions**: Intelligent recommendations for debt payoff and budget optimization
 - **Automated Calculations**: Interest projections, payoff timelines, and savings goals
 - **Smart Alerts**: Payment reminders, budget warnings, and goal milestones
 - **Financial Insights**: Personalized tips based on spending patterns
 
-### 🎨 Modern UI/UX
+### Modern UI/UX
 - **Glass Morphism Design**: Beautiful frosted glass effects throughout
 - **Advanced Animations**: Framer Motion powered transitions and micro-interactions
 - **Responsive Design**: Mobile-first approach with perfect desktop experience
 - **Dark/Light Mode**: Automatic theme switching with custom color schemes
 - **Interactive Elements**: Hover effects, loading states, and smooth transitions
 
-### 🔧 Technical Features
+### Technical Features
 - **Real-time Updates**: Live data synchronization across all components
 - **Offline Support**: Progressive Web App capabilities
 - **Performance Optimized**: Code splitting, lazy loading, and caching strategies
 - **Type Safety**: Full TypeScript implementation with strict type checking
 - **Database Integration**: MongoDB with Mongoose ODM for data persistence
 
-## 🛠️ Technology Stack
+## Technology Stack
 
 ### Frontend
 - **Next.js 15.5.2** - React framework with App Router
@@ -67,14 +67,14 @@ A comprehensive, modern personal finance management application built with Next.
 - **React Circular Progressbar** - Animated progress indicators
 - **React CountUp** - Smooth number animations
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Prerequisites
 - Node.js 18+ 
 - MongoDB Atlas account (or local MongoDB)
 - Gmail account for email features
 
-## 📱 Features Overview
+## Features Overview
 
 ### Credit Card Management
 - Add unlimited credit cards with custom names and colors
@@ -163,7 +163,7 @@ A comprehensive, modern personal finance management application built with Next.
 - `POST /api/email` - Send email
 - `GET /api/email?type=payment-reminders` - Automated emails
 
-## 🎯 Smart Features
+## Smart Features
 
 ### AI-Powered Suggestions
 The dashboard includes an intelligent suggestion system that analyzes your financial data and provides personalized recommendations:
@@ -198,7 +198,7 @@ All emails feature modern, responsive HTML templates with:
 - Personalized content
 - Brand-consistent styling
 
-## 🔒 Security Features
+## Security Features
 
 - **Environment Variables**: Secure configuration management
 - **Input Validation**: Zod schema validation
@@ -207,7 +207,7 @@ All emails feature modern, responsive HTML templates with:
 - **Rate Limiting**: API endpoint protection
 - **Secure Headers**: Security-first approach
 
-## 📱 Mobile Experience
+## Mobile Experience
 
 The dashboard is fully responsive with mobile-first design:
 - Touch-friendly interfaces
@@ -216,7 +216,7 @@ The dashboard is fully responsive with mobile-first design:
 - Mobile-specific animations
 - Progressive Web App capabilities
 
-## 🚀 Deployment
+## Deployment
 
 ### Vercel Deployment (Recommended)
 1. Push your code to GitHub
@@ -235,7 +235,7 @@ NEXTAUTH_SECRET=your-production-nextauth-secret
 CRON_SECRET=your-cron-secret
 ```
 
-## 🤝 Contributing
+## Contributing
 
 We welcome contributions! Please follow these steps:
 
@@ -253,11 +253,11 @@ We welcome contributions! Please follow these steps:
 - Test on multiple devices
 - Document new features
 
-## 📄 License
+## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 🙏 Acknowledgments
+## Acknowledgments
 
 - **Next.js Team** - For the amazing React framework
 - **Vercel** - For seamless deployment platform
@@ -266,18 +266,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - **MongoDB** - For flexible data storage
 - **Lucide** - For beautiful icons
 
-## 📞 Support
 
-For support, email contact@sigmapointpi.com or join our Discord community.
-
-## 🔗 Links
-
-- **Live Demo**: [https://budget.sigmapointpi.com](https://budget.sigmapointpi.com)
-- **Documentation**: [https://docs.sigmapointpi.com](https://docs.sigmapointpi.com)
-- **API Reference**: [https://api.sigmapointpi.com](https://api.sigmapointpi.com)
-
----
-
-**Built with ❤️ by the SigmaPointPi Team**
+**Built by the SPP Team**
 
 *Empowering financial freedom through beautiful, intelligent software.*
