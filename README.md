@@ -1,4 +1,4 @@
-# Personal Finance Dashboard | Budget.SigmaPointPi.com
+# Personal Finance Dashboard | 
 
 A comprehensive, modern personal finance management application built with Next.js 15, featuring AI-powered insights, beautiful animations, and complete financial tracking capabilities.
 
@@ -226,13 +226,13 @@ The dashboard is fully responsive with mobile-first design:
 
 ### Environment Variables for Production
 ```env
-MONGO_URI=your-production-mongodb-uri
-JWT_SECRET=your-production-jwt-secret
-EMAIL_USER=your-production-email
-EMAIL_PASS=your-production-email-password
-NEXTAUTH_URL=https://your-domain.com
-NEXTAUTH_SECRET=your-production-nextauth-secret
-CRON_SECRET=your-cron-secret
+MONGO_URI=
+JWT_SECRET=
+EMAIL_USER=
+EMAIL_PASS=
+NEXTAUTH_URL=
+NEXTAUTH_SECRET=
+CRON_SECRET=
 ```
 
 ## Contributing
@@ -267,6 +267,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - **Lucide** - For beautiful icons
 
 
-**Built by the SPP Team**
+**Built w/ hardcore codes. Just for fun**
 
 *Empowering financial freedom through beautiful, intelligent software.*
